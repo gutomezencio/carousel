@@ -19,8 +19,12 @@ export default {
           'style-loader',
           {
             loader: 'css-loader',
-            options: { modules: true }
+            options: {
+              sourceMap: true,
+              importLoaders: 2
+            }
           },
+          'scoped-css-loader',
           'sass-loader'
         ]
       }

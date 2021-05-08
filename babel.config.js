@@ -7,6 +7,7 @@ module.exports = function (api) {
       '@babel/preset-react'
     ],
     plugins: [
+      ['babel-plugin-react-scoped-css'],
       ['@babel/plugin-proposal-class-properties'],
       ['@babel/plugin-transform-runtime',
         {

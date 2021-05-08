@@ -1,5 +1,7 @@
 import React from 'react'
 
+import './Carousel.scoped.scss'
+
 const Carousel = () => {
   return (
     <div className="carousel">
