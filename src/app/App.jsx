@@ -1,19 +1,20 @@
 import React from 'react'
+import { hot } from 'react-hot-loader'
 
 import {
-  Router,
+  BrowserRouter as Router,
   Route
 } from 'react-router-dom'
 
-import { createBrowserHistory } from 'history'
+// import { createBrowserHistory } from 'history'
 
-const history = createBrowserHistory()
+// const history = createBrowserHistory()
 
 import Carousel from 'app/modules/Carousel'
 
 const App = () => {
   return (
-    <Router history={ history }>
+    <Router>
       <main className="app">
         <Route exact={ true } path="/" component={ Carousel } />
       </main>
@@ -21,7 +22,4 @@ const App = () => {
   )
 }
 
-export {
-  history
-}
-export default App
+export default hot(module)(App)

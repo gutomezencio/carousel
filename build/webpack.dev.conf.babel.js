@@ -49,7 +49,7 @@ export default {
     quiet: true,
     historyApiFallback: true
   },
-  devtool: 'eval-source-map',
+  devtool: 'inline-source-map',
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
