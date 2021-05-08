@@ -6,11 +6,10 @@ import {
   Route
 } from 'react-router-dom'
 
-// import { createBrowserHistory } from 'history'
-
-// const history = createBrowserHistory()
 
 import Carousel from 'app/modules/Carousel'
+
+import 'app/styles/default.scss'
 
 const App = () => {
   return (
