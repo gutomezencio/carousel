@@ -24,7 +24,7 @@ After you submit it, our developers will evaluate it and provide you with action
 - Supports multiple slides on the screen
 - Supports infinite option
 - Supports scrolling to a selected slide (like go to slide X)
-Any optimizations related to performance are welcome and appreciated!
+- Any optimizations related to performance are welcome and appreciated!
 
 **Also:**
 
