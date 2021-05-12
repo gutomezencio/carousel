@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom'
 
 
-import Carousel from 'app/modules/Carousel'
+import CarouselArea from 'app/modules/CarouselArea'
 
 import 'app/styles/default.scss'
 
@@ -15,7 +15,7 @@ const App = () => {
   return (
     <Router>
       <main className="app">
-        <Route exact={ true } path="/" component={ Carousel } />
+        <Route exact={ true } path="/" component={ CarouselArea } />
       </main>
     </Router>
   )

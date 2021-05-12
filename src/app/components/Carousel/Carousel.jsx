@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
+import PropTypes from 'prop-types'
 
 import './Carousel.scoped.scss'
 
-const Carousel = () => {
+const Carousel = ({ visilbleItems }) => {
   const wrapperRef = useRef()
   const listRef = useRef()
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -47,12 +48,29 @@ const Carousel = () => {
 
     if (listRef?.current) {
       const itemsEls = listRef.current.querySelectorAll('.carousel__item')
-      const elWidth = getAbsoluteWidth(itemsEls[0])
+      let count = 0;
 
-      setSlideCount(parseInt((elWidth.fullWidth * itemsEls.length - elWidth.margin) / wrapperWidth.fullWidth))
-      listWidth = elWidth.fullWidth * itemsEls.length - elWidth.margin
+      if (!visilbleItems) {
+        const elWidth = getAbsoluteWidth(itemsEls[0])
+
+        listWidth = elWidth.fullWidth * itemsEls.length - elWidth.margin;
+        count = parseInt(listWidth / wrapperWidth.fullWidth)
+      } else {
+        count = parseInt(itemsEls.length / visilbleItems)
+      }
+
+      setSlideCount(count);
     }
   }, [wrapperRef, listRef]);
+
+  useEffect(() => {
+    if (visilbleItems) {
+      listRef.current.querySelectorAll('.carousel__item').forEach((item) => {
+        item.style.minWidth = `${100 / visilbleItems}%`
+        item.style.marginRight = `0`
+      })
+    }
+  }, [visilbleItems])
 
   return (
     <div className="carousel">
@@ -97,7 +115,7 @@ const Carousel = () => {
           type="button"
           onClick={prevHandler}
           className={`carousel__actions__button ${
-            currentSlide === 0 ? 'carousel__actions__button--inactive' : ''
+            currentSlide === 0 ? "carousel__actions__button--inactive" : ""
           }`}
         >
           Prev
@@ -106,7 +124,9 @@ const Carousel = () => {
           type="button"
           onClick={nextHandler}
           className={`carousel__actions__button ${
-            currentSlide === slideCount ? 'carousel__actions__button--inactive' : ''
+            currentSlide === slideCount
+              ? "carousel__actions__button--inactive"
+              : ""
           }`}
         >
           Next
@@ -115,5 +135,9 @@ const Carousel = () => {
     </div>
   );
 }
+
+Carousel.propTypes = {
+  visilbleItems: PropTypes.number
+};
 
 export default Carousel
