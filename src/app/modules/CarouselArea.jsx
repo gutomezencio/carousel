@@ -12,8 +12,12 @@ const CarouselArea = () => {
       <div className="carousel-area__item">
         <Carousel visilbleItems={1} />
       </div>
+
+      <div className="carousel-area__item">
+        <Carousel infinity={true} />
+      </div>
     </div>
-  )
+  );
 }
 
 export default CarouselArea

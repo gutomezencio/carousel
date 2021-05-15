@@ -6,7 +6,6 @@ import {
   Route
 } from 'react-router-dom'
 
-
 import CarouselArea from 'app/modules/CarouselArea'
 
 import 'app/styles/default.scss'

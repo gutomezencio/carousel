@@ -4,6 +4,7 @@
   &__wrapper {
     overflow: hidden;
     margin: 20px;
+    position: relative;
   }
 
   &__list {
@@ -11,6 +12,7 @@
     flex-wrap: nowrap;
     transition: transform 1s cubic-bezier(0.41, 0.36, 0.05, 0.95);
     backface-visibility: hidden;
+    position: relative;
   }
 
   &__item {
@@ -51,5 +53,11 @@
         }
       }
     }
+  }
+
+  &__number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
