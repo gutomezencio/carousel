@@ -45,38 +45,38 @@ const Carousel = ({ visilbleItems, infinity }) => {
   }
 
   const nextHandler = event => {
-    if (infinity) {
-      if (!visilbleItems) {
-        const itemWidth = getAbsoluteWidth(slideItemsEl[0])
-        const wrapperWidth = getAbsoluteWidth(wrapperRef.current)
-        const currentItemsEls = listRef.current.querySelectorAll('.carousel__item')
-        const listWidth = ((itemWidth.fullWidth * currentItemsEls.length) - itemWidth.margin) - listRef.current.style.left.replace(/px|-/g, '')
-        const currentCount = parseInt(listWidth / wrapperWidth.fullWidth)
-        const translationMultiplier = currentSlide < 0 ? Math.abs(currentSlide) - 1 : currentSlide + 1
+    if (infinity && !visilbleItems) {
+      const itemWidth = getAbsoluteWidth(slideItemsEl[0])
+      const wrapperWidth = getAbsoluteWidth(wrapperRef.current)
+      const currentItemsEls = listRef.current.querySelectorAll('.carousel__item')
+      const listWidth = ((itemWidth.fullWidth * currentItemsEls.length) - itemWidth.margin) - listRef.current.style.left.replace(/px|-/g, '')
+      const currentCount = parseInt(listWidth / wrapperWidth.fullWidth)
+      const translationMultiplier = currentSlide < 0 ? Math.abs(currentSlide) - 1 : currentSlide + 1
 
-        if (currentCount === currentSlide + 1) {
-          Array.from(slideItemsEl)
-            .forEach(elNode => {
-              const currentEls = listRef.current.querySelectorAll('.carousel__item')
+      if (currentCount === currentSlide + 1) {
+        Array.from(slideItemsEl)
+          .forEach(elNode => {
+            const currentEls = listRef.current.querySelectorAll('.carousel__item')
 
-              listRef.current.insertBefore(
-                elNode.cloneNode(true),
-                currentEls[currentEls.length - 1].nextSibling
-              )
-            })
-        }
-        listRef.current.style.transform = `translate3d(${currentSlide < 0 ? '' : '-'}${translationMultiplier * 100}%, 0, 0)`
+            listRef.current.insertBefore(
+              elNode.cloneNode(true),
+              currentEls[currentEls.length - 1].nextSibling
+            )
+          })
+      }
+      listRef.current.style.transform = `translate3d(${currentSlide < 0 ? '' : '-'}${translationMultiplier * 100}%, 0, 0)`
+      setCurrentSlide(currentSlide + 1)
+    } else {
+      if (currentSlide < slideCount) {
+        const slideTranslate = (currentSlide + 1) * 100
+        listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
+
         setCurrentSlide(currentSlide + 1)
-      } else {
+      } else if (infinity) {
         listRef.current.style.transform = `translate3d(0, 0, 0)`
 
         setCurrentSlide(0)
       }
-    } else if (currentSlide < slideCount) {
-      const slideTranslate = (currentSlide + 1) * 100
-      listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
-
-      setCurrentSlide(currentSlide + 1)
     }
   }
 
@@ -91,8 +91,8 @@ const Carousel = ({ visilbleItems, infinity }) => {
   }
 
   useEffect(() => {
-    let wrapperWidth = null
-    let listWidth = null
+    let wrapperWidth = null;
+    let listWidth = null;
 
     if (wrapperRef?.current) {
       wrapperWidth = getAbsoluteWidth(wrapperRef.current)
@@ -103,19 +103,19 @@ const Carousel = ({ visilbleItems, infinity }) => {
       let count = 0;
 
       if (!visilbleItems) {
-        const elWidth = getAbsoluteWidth(itemsEls[0])
+        const elWidth = getAbsoluteWidth(itemsEls[0]);
 
-        listWidth = elWidth.fullWidth * itemsEls.length - elWidth.margin;
+        listWidth = elWidth.fullWidth * itemsEls.length - elWidth.margin
         count = parseInt(listWidth / wrapperWidth.fullWidth)
       } else {
         count = parseInt(itemsEls.length / visilbleItems)
-        count = visilbleItems === 1 ? count - 1 : count
+        count = itemsEls.length % visilbleItems === 0 ? count - 1 : count
       }
 
       setSlideCount(count);
       setSlideItemsEl(itemsEls);
     }
-  }, [wrapperRef, listRef]);
+  }, [wrapperRef, listRef, visilbleItems]);
 
   useEffect(() => {
     if (visilbleItems) {
@@ -173,6 +173,10 @@ const Carousel = ({ visilbleItems, infinity }) => {
           <div className="carousel__item">
             <img src="https://picsum.photos/id/88/200/300" alt="Some image" />
           </div>
+
+          {/* <div className="carousel__item">
+            <img src="https://picsum.photos/id/99/200/300" alt="Some image" />
+          </div> */}
         </div>
       </div>
 

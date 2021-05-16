@@ -16,6 +16,14 @@ const CarouselArea = () => {
       <div className="carousel-area__item">
         <Carousel infinity={true} />
       </div>
+
+      <div className="carousel-area__item">
+        <Carousel visilbleItems={5} infinity={true} />
+      </div>
+
+      <div className="carousel-area__item">
+        <Carousel visilbleItems={2} infinity={true} />
+      </div>
     </div>
   );
 }
