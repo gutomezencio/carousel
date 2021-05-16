@@ -15,7 +15,7 @@
     position: relative;
   }
 
-  &__item {
+  /deep/ &__item {
     min-width: 300px;
     height: 300px;
     margin-right: 5px;
