@@ -61,6 +61,8 @@ const Carousel = ({ children, visilbleItems, infinity, restartOnEnd }) => {
       const translationMultiplier =
         currentSlide < 0 ? Math.abs(currentSlide) - 1 : currentSlide + 1
 
+      console.log('COUNT', currentCount)
+
       if (currentCount === currentSlide + 1) {
         Array.from(slideItemsEl).forEach(elNode => {
           const currentEls = listRef.current.querySelectorAll('.carousel__item')
@@ -102,11 +104,12 @@ const Carousel = ({ children, visilbleItems, infinity, restartOnEnd }) => {
   }
 
   useEffect(() => {
-    const itemsEls = listRef.current.querySelectorAll('.carousel__item')
+    let itemsEls = listRef.current.querySelectorAll('.carousel__item')
 
     if (childrenItems && itemsEls.length) {
       let wrapperWidth = null
       let listWidth = null
+      let elWidth = null
 
       if (wrapperRef?.current) {
         wrapperWidth = getAbsoluteWidth(wrapperRef.current)
@@ -116,13 +119,30 @@ const Carousel = ({ children, visilbleItems, infinity, restartOnEnd }) => {
         let count = 0
 
         if (!visilbleItems) {
-          const elWidth = getAbsoluteWidth(itemsEls[0])
-
+          elWidth = getAbsoluteWidth(itemsEls[0])
           listWidth = elWidth.fullWidth * itemsEls.length - elWidth.margin
           count = parseInt(listWidth / wrapperWidth.fullWidth)
         } else {
           count = parseInt(itemsEls.length / visilbleItems)
           count = itemsEls.length % visilbleItems === 0 ? count - 1 : count
+        }
+
+        if (infinity && count === 0) {
+          const alowedQuant = wrapperWidth.fullWidth / elWidth.fullWidth
+
+          if (alowedQuant - itemsEls.length !== 0) {
+            Array.from(itemsEls).forEach(elNode => {
+              const currentEls =
+                listRef.current.querySelectorAll('.carousel__item')
+
+              listRef.current.insertBefore(
+                elNode.cloneNode(true),
+                currentEls[currentEls.length - 1].nextSibling
+              )
+            })
+
+            itemsEls = listRef.current.querySelectorAll('.carousel__item')
+          }
         }
 
         setSlideCount(count)
