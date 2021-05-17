@@ -2,6 +2,7 @@ import { pathResolve } from './utils'
 import webpack from 'webpack'
 import WebpackBar from 'webpackbar'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
+import ESLintPlugin from 'eslint-webpack-plugin'
 
 export default {
   entry: './src/app/index.js',
@@ -56,6 +57,7 @@ export default {
   devtool: 'inline-source-map',
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
+    new ESLintPlugin(),
     new HtmlWebpackPlugin({
       template: './src/index.html',
       minify: false,
@@ -64,6 +66,6 @@ export default {
     new WebpackBar({
       name: 'Carousel App is building...',
       color: '#D6383E'
-    }),
+    })
   ]
 }

@@ -21,21 +21,17 @@ const CarouselArea = () => {
         <div className="some-class" key={index}>
           <img src={image} alt={`image-${index}`} />
         </div>
-      );
+      )
     })
   }
   return (
     <div className="carousel-area">
       <div className="carousel-area__item">
-        <Carousel>
-          {generateItems(9)}
-        </Carousel>
+        <Carousel>{generateItems(9)}</Carousel>
       </div>
 
       <div className="carousel-area__item">
-        <Carousel infinity={true}>
-          {generateItems(4)}
-        </Carousel>
+        <Carousel infinity={true}>{generateItems(4)}</Carousel>
       </div>
 
       <div className="carousel-area__item">
@@ -45,9 +41,7 @@ const CarouselArea = () => {
       </div>
 
       <div className="carousel-area__item">
-        <Carousel infinity={true}>
-          {generateItems(8)}
-        </Carousel>
+        <Carousel infinity={true}>{generateItems(8)}</Carousel>
       </div>
 
       <div className="carousel-area__item">
@@ -68,7 +62,7 @@ const CarouselArea = () => {
         </Carousel>
       </div>
     </div>
-  );
+  )
 }
 
 export default CarouselArea

@@ -1,0 +1,47 @@
+{
+  "root": true,
+  "env": {
+    "es6": true,
+    "browser": true,
+    "es2021": true
+  },
+  "parserOptions": {
+    "parser": "babel-eslint",
+    "ecmaVersion": 2021,
+    "sourceType": "module",
+    "allowImportExportEverywhere": true,
+    "ecmaFeatures": {
+        "jsx": true
+    }
+  },
+  "plugins": ["react", "prettier"],
+  "globals": {
+    "fetch": true,
+    "System": true
+  },
+  "extends": ["plugin:prettier/recommended", "plugin:react/recommended"],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "rules": {
+    "no-debugger": 0,
+    "arrow-parens": 0,
+    "generator-star-spacing": 0,
+    "comma-dangle": ["error", "never"],
+    "no-mixed-operators": 0,
+    "quote-props": [2, "as-needed"],
+    "no-case-declarations": 0,
+    "array-bracket-newline": ["error", { "multiline": true }],
+    "no-multi-str": 1,
+    "max-len": ["error", { "ignoreTemplateLiterals": true }],
+    "prettier/prettier": [
+      "error",
+      {},
+      {
+        "usePrettierrc": true
+      }
+    ]
+  }
+}
