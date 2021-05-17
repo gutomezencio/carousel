@@ -3,7 +3,15 @@ import PropTypes from 'prop-types'
 
 import './Carousel.scoped.scss'
 
-const Carousel = ({ children, visilbleItems, infinity, restartOnEnd }) => {
+const Carousel = ({
+  children,
+  visilbleItems,
+  infinity,
+  restartOnEnd,
+  height,
+  width
+}) => {
+  const carouselRef = useRef()
   const wrapperRef = useRef()
   const listRef = useRef()
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -61,8 +69,6 @@ const Carousel = ({ children, visilbleItems, infinity, restartOnEnd }) => {
       const translationMultiplier =
         currentSlide < 0 ? Math.abs(currentSlide) - 1 : currentSlide + 1
 
-      console.log('COUNT', currentCount)
-
       if (currentCount === currentSlide + 1) {
         Array.from(slideItemsEl).forEach(elNode => {
           const currentEls = listRef.current.querySelectorAll('.carousel__item')
@@ -103,7 +109,27 @@ const Carousel = ({ children, visilbleItems, infinity, restartOnEnd }) => {
     }
   }
 
-  useEffect(() => {
+  const waitForElementWidth = async () => {
+    let resizeObserver = null
+
+    await new Promise(resolve => {
+      let itemsEls = listRef.current.querySelectorAll('.carousel__item')
+
+      resizeObserver = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          const { width } = entry.contentRect
+
+          if (width) {
+            resizeObserver.unobserve(itemsEls[0])
+            return resolve('rendered!')
+          }
+        }
+      })
+      resizeObserver.observe(itemsEls[0])
+    })
+  }
+
+  useEffect(async () => {
     let itemsEls = listRef.current.querySelectorAll('.carousel__item')
 
     if (childrenItems && itemsEls.length) {
@@ -117,9 +143,21 @@ const Carousel = ({ children, visilbleItems, infinity, restartOnEnd }) => {
 
       if (listRef?.current) {
         let count = 0
+        elWidth = getAbsoluteWidth(itemsEls[0])
 
         if (!visilbleItems) {
-          elWidth = getAbsoluteWidth(itemsEls[0])
+          if (elWidth.fullWidth === 0) {
+            await waitForElementWidth()
+
+            elWidth = getAbsoluteWidth(itemsEls[0])
+
+            // console.log('EL WIDTH', elWidth)
+            // console.log('EL FULL WIDTH', elWidth.fullWidth * itemsEls.length)
+            // console.log('LIST', listWidth)
+            // console.log('ITEMS', itemsEls.length)
+            // console.log('COUNT', listWidth / wrapperWidth.fullWidth)
+          }
+
           listWidth = elWidth.fullWidth * itemsEls.length - elWidth.margin
           count = parseInt(listWidth / wrapperWidth.fullWidth)
         } else {
@@ -129,6 +167,9 @@ const Carousel = ({ children, visilbleItems, infinity, restartOnEnd }) => {
 
         if (infinity && count === 0) {
           const alowedQuant = wrapperWidth.fullWidth / elWidth.fullWidth
+          // console.log('AL?', alowedQuant)
+          // console.log('WP', wrapperWidth)
+          // console.log('EL?', elWidth)
 
           if (alowedQuant - itemsEls.length !== 0) {
             Array.from(itemsEls).forEach(elNode => {
@@ -152,7 +193,11 @@ const Carousel = ({ children, visilbleItems, infinity, restartOnEnd }) => {
   }, [wrapperRef, listRef, visilbleItems, childrenItems])
 
   useEffect(() => {
-    if (children) {
+    if (children && carouselRef?.current) {
+      if (width) {
+        carouselRef.current.style.width = width
+      }
+
       const processedItems = children.map((item, index) => {
         return React.cloneElement(item, {
           key: index,
@@ -164,14 +209,15 @@ const Carousel = ({ children, visilbleItems, infinity, restartOnEnd }) => {
                   minWidth: `${100 / visilbleItems}%`,
                   marginRight: '0'
                 }
-              : {})
+              : {}),
+            ...(height ? { height } : {})
           }
         })
       })
 
       setChildrenItems(processedItems)
     }
-  }, [children, setChildrenItems])
+  }, [children, wrapperRef, setChildrenItems])
 
   const buttonInactive = useCallback(
     type => {
@@ -189,14 +235,16 @@ const Carousel = ({ children, visilbleItems, infinity, restartOnEnd }) => {
   )
 
   return (
-    <div className="carousel">
+    <div className="carousel" ref={carouselRef}>
       <div className="carousel__wrapper" ref={wrapperRef}>
         <div className="carousel__list" ref={listRef}>
           {childrenItems}
         </div>
       </div>
 
-      <div className="carousel__number">{currentSlide + 1}</div>
+      <div className="carousel__number">
+        {currentSlide >= 0 ? currentSlide + 1 : currentSlide}
+      </div>
 
       <div className="carousel__actions">
         <button
@@ -226,7 +274,9 @@ Carousel.propTypes = {
   visilbleItems: PropTypes.number,
   infinity: PropTypes.bool,
   restartOnEnd: PropTypes.bool,
-  children: PropTypes.array
+  children: PropTypes.array,
+  height: PropTypes.string,
+  width: PropTypes.string
 }
 
 export default Carousel

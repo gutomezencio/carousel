@@ -1,0 +1,11 @@
+.carousel-area {
+  &__item {
+    text-align: center;
+    margin: 20px 0;
+    overflow: hidden;
+
+    /deep/ .carousel {
+      margin: 0 auto;
+    }
+  }
+}
