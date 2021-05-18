@@ -309,30 +309,32 @@ const Carousel = forwardRef(
           </div>
         )}
 
-        <div className="carousel__actions">
-          <button
-            type="button"
-            onClick={prevHandler}
-            className={`carousel__actions__button ${
-              buttonInactive('prev')
-                ? 'carousel__actions__button--inactive'
-                : ''
-            }`}
-          >
-            Prev
-          </button>
-          <button
-            type="button"
-            onClick={nextHandler}
-            className={`carousel__actions__button ${
-              buttonInactive('next')
-                ? 'carousel__actions__button--inactive'
-                : ''
-            }`}
-          >
-            Next
-          </button>
-        </div>
+        {!hideActions && (
+          <div className="carousel__actions">
+            <button
+              type="button"
+              onClick={prevHandler}
+              className={`carousel__actions__button ${
+                buttonInactive('prev')
+                  ? 'carousel__actions__button--inactive'
+                  : ''
+              }`}
+            >
+              Prev
+            </button>
+            <button
+              type="button"
+              onClick={nextHandler}
+              className={`carousel__actions__button ${
+                buttonInactive('next')
+                  ? 'carousel__actions__button--inactive'
+                  : ''
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     )
   }
@@ -349,7 +351,8 @@ Carousel.propTypes = {
   width: PropTypes.string,
   onChange: PropTypes.func,
   showCurrentNumber: PropTypes.bool,
-  showNavigation: PropTypes.bool
+  showNavigation: PropTypes.bool,
+  hideActions: PropTypes.bool
 }
 
 export default Carousel

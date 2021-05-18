@@ -139,6 +139,13 @@ const CarouselArea = () => {
         </Carousel>
         <p>{JSON.stringify(onChangeValues)}</p>
       </div>
+
+      <div className="carousel-area__item">
+        <h2>Without actions</h2>
+        <Carousel visilbleItems={2} restartOnEnd={true} hideActions={true}>
+          {generateItems(5)}
+        </Carousel>
+      </div>
     </div>
   )
 }
