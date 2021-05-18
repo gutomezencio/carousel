@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import './CarouselArea.scoped.scss'
 
@@ -29,6 +29,13 @@ const CarouselArea = () => {
       )
     })
   }
+
+  const [onChangeValues, setOnChangeValues] = useState('')
+
+  const onChangeCallback = values => {
+    setOnChangeValues(values)
+  }
+
   return (
     <div className="carousel-area">
       <div className="carousel-area__item">
@@ -75,7 +82,7 @@ const CarouselArea = () => {
       </div>
 
       <div className="carousel-area__item">
-        <h2>Restarting on end with 1 Visible Slides</h2>
+        <h2>Restarting on end with 1 Visible Slide</h2>
         <Carousel visilbleItems={1} restartOnEnd={true}>
           {generateItems(9)}
         </Carousel>
@@ -84,6 +91,18 @@ const CarouselArea = () => {
       <div className="carousel-area__item">
         <h2>Simple with Restarting on end</h2>
         <Carousel restartOnEnd={true}>{generateItems(9)}</Carousel>
+      </div>
+
+      <div className="carousel-area__item">
+        <h2>Simple with On Change</h2>
+        <Carousel
+          onChange={onChangeCallback}
+          visilbleItems={2}
+          restartOnEnd={true}
+        >
+          {generateItems(9)}
+        </Carousel>
+        <p>{JSON.stringify(onChangeValues)}</p>
       </div>
     </div>
   )

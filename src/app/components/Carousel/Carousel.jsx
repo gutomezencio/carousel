@@ -9,15 +9,17 @@ const Carousel = ({
   infinity,
   restartOnEnd,
   height,
-  width
+  width,
+  onChange
 }) => {
   const carouselRef = useRef()
   const wrapperRef = useRef()
   const listRef = useRef()
   const [currentSlide, setCurrentSlide] = useState(0)
-  const [slideCount, setSlideCount] = useState(0)
+  const [slideCount, setSlideCount] = useState(null)
   const [slideItemsEl, setSlideItemsEl] = useState(null)
   const [childrenItems, setChildrenItems] = useState(null)
+  const [currentSlideFormated, setCurrentSlideFormated] = useState()
 
   const prevHandler = event => {
     if (currentSlide > 0) {
@@ -234,6 +236,21 @@ const Carousel = ({
     [currentSlide, slideCount, infinity, restartOnEnd]
   )
 
+  useEffect(() => {
+    if (slideCount) {
+      const formated = currentSlide >= 0 ? currentSlide + 1 : currentSlide
+
+      setCurrentSlideFormated(formated)
+
+      if (onChange) {
+        onChange({
+          currentSlide: formated,
+          totalSlides: slideCount + 1
+        })
+      }
+    }
+  }, [currentSlide, slideCount])
+
   return (
     <div className="carousel" ref={carouselRef}>
       <div className="carousel__wrapper" ref={wrapperRef}>
@@ -242,9 +259,7 @@ const Carousel = ({
         </div>
       </div>
 
-      <div className="carousel__number">
-        {currentSlide >= 0 ? currentSlide + 1 : currentSlide}
-      </div>
+      <div className="carousel__number">{currentSlideFormated}</div>
 
       <div className="carousel__actions">
         <button
@@ -276,7 +291,8 @@ Carousel.propTypes = {
   restartOnEnd: PropTypes.bool,
   children: PropTypes.array,
   height: PropTypes.string,
-  width: PropTypes.string
+  width: PropTypes.string,
+  onChange: PropTypes.func
 }
 
 export default Carousel
