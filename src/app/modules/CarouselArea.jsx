@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 
 import './CarouselArea.scoped.scss'
 
@@ -35,6 +35,9 @@ const CarouselArea = () => {
   const onChangeCallback = values => {
     setOnChangeValues(values)
   }
+
+  const [goToSlideValue, setGoToSlideValue] = useState()
+  const goToSlideExample = useRef(null)
 
   return (
     <div className="carousel-area">
@@ -91,6 +94,38 @@ const CarouselArea = () => {
       <div className="carousel-area__item">
         <h2>Simple with Restarting on end</h2>
         <Carousel restartOnEnd={true}>{generateItems(9)}</Carousel>
+      </div>
+
+      <div className="carousel-area__item">
+        <h2>Simple with Navigation</h2>
+        <Carousel restartOnEnd={true} showNavigation={true} visilbleItems={2}>
+          {generateItems(9)}
+        </Carousel>
+      </div>
+
+      <div className="carousel-area__item">
+        <h2>Go to Slide</h2>
+        <Carousel
+          restartOnEnd={true}
+          ref={goToSlideExample}
+          visilbleItems={3}
+          showCurrentNumber={true}
+        >
+          {generateItems(9)}
+        </Carousel>
+        <p>
+          Go to slide:
+          <input
+            type="text"
+            onChange={({ target }) => setGoToSlideValue(target.value)}
+          />
+          <button
+            type="button"
+            onClick={() => goToSlideExample?.current?.goToSlide(goToSlideValue)}
+          >
+            Go
+          </button>
+        </p>
       </div>
 
       <div className="carousel-area__item">

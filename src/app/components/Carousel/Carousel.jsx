@@ -1,289 +1,344 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  forwardRef,
+  useImperativeHandle
+} from 'react'
 import PropTypes from 'prop-types'
 
 import './Carousel.scoped.scss'
 
-const Carousel = ({
-  children,
-  visilbleItems,
-  infinity,
-  restartOnEnd,
-  height,
-  width,
-  onChange
-}) => {
-  const carouselRef = useRef()
-  const wrapperRef = useRef()
-  const listRef = useRef()
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [slideCount, setSlideCount] = useState(null)
-  const [slideItemsEl, setSlideItemsEl] = useState(null)
-  const [childrenItems, setChildrenItems] = useState(null)
-  const [currentSlideFormated, setCurrentSlideFormated] = useState()
+const Carousel = forwardRef(
+  (
+    {
+      children,
+      visilbleItems,
+      infinity,
+      restartOnEnd,
+      height,
+      width,
+      onChange,
+      showCurrentNumber,
+      showNavigation,
+      hideActions,
+      ...rest
+    },
+    ref
+  ) => {
+    const carouselRef = useRef()
+    const wrapperRef = useRef()
+    const listRef = useRef()
+    const [currentSlide, setCurrentSlide] = useState(0)
+    const [slideCount, setSlideCount] = useState(null)
+    const [slideItemsEl, setSlideItemsEl] = useState(null)
+    const [childrenItems, setChildrenItems] = useState(null)
+    const [currentSlideFormated, setCurrentSlideFormated] = useState()
 
-  const prevHandler = event => {
-    if (currentSlide > 0) {
-      const slideTranslate = (currentSlide - 1) * 100
-      listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
+    const prevHandler = event => {
+      if (currentSlide > 0) {
+        const slideTranslate = (currentSlide - 1) * 100
+        listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
 
-      setCurrentSlide(currentSlide - 1)
-    } else if (infinity && !restartOnEnd) {
-      const itemWidth = getAbsoluteWidth(slideItemsEl[0])
-      const cloneQuant = slideItemsEl.length
-      const leftMultiplier = currentSlide ? Math.abs(currentSlide) + 1 : 1
+        setCurrentSlide(currentSlide - 1)
+      } else if (infinity && !restartOnEnd) {
+        const itemWidth = getAbsoluteWidth(slideItemsEl[0])
+        const cloneQuant = slideItemsEl.length
+        const leftMultiplier = currentSlide ? Math.abs(currentSlide) + 1 : 1
 
-      listRef.current.style.left = `-${
-        (itemWidth.fullWidth + itemWidth.margin) * leftMultiplier * cloneQuant
-      }px`
+        listRef.current.style.left = `-${
+          (itemWidth.fullWidth + itemWidth.margin) * leftMultiplier * cloneQuant
+        }px`
 
-      Array.from(slideItemsEl)
-        .reverse()
-        .forEach(elNode => {
-          listRef.current.insertBefore(
-            elNode.cloneNode(true),
-            listRef.current.querySelectorAll('.carousel__item')[0]
-          )
-        })
+        Array.from(slideItemsEl)
+          .reverse()
+          .forEach(elNode => {
+            listRef.current.insertBefore(
+              elNode.cloneNode(true),
+              listRef.current.querySelectorAll('.carousel__item')[0]
+            )
+          })
 
-      listRef.current.style.transform = `translate3d(${
-        leftMultiplier * 100
-      }%, 0, 0)`
-      setCurrentSlide(currentSlide - 1)
-    } else if (restartOnEnd) {
-      const slideTranslate = slideCount * 100
+        listRef.current.style.transform = `translate3d(${
+          leftMultiplier * 100
+        }%, 0, 0)`
+        setCurrentSlide(currentSlide - 1)
+      } else if (restartOnEnd) {
+        const slideTranslate = slideCount * 100
 
-      listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
-      setCurrentSlide(slideCount)
-    }
-  }
-
-  const nextHandler = event => {
-    if (infinity && !restartOnEnd) {
-      const itemWidth = getAbsoluteWidth(slideItemsEl[0])
-      const wrapperWidth = getAbsoluteWidth(wrapperRef.current)
-      const currentItemsEls =
-        listRef.current.querySelectorAll('.carousel__item')
-      const listWidth =
-        itemWidth.fullWidth * currentItemsEls.length -
-        itemWidth.margin -
-        listRef.current.style.left.replace(/px|-/g, '')
-      const currentCount = parseInt(listWidth / wrapperWidth.fullWidth)
-      const translationMultiplier =
-        currentSlide < 0 ? Math.abs(currentSlide) - 1 : currentSlide + 1
-
-      if (currentCount === currentSlide + 1) {
-        Array.from(slideItemsEl).forEach(elNode => {
-          const currentEls = listRef.current.querySelectorAll('.carousel__item')
-
-          listRef.current.insertBefore(
-            elNode.cloneNode(true),
-            currentEls[currentEls.length - 1].nextSibling
-          )
-        })
+        listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
+        setCurrentSlide(slideCount)
       }
-
-      listRef.current.style.transform = `translate3d(${
-        currentSlide < 0 ? '' : '-'
-      }${translationMultiplier * 100}%, 0, 0)`
-
-      setCurrentSlide(currentSlide + 1)
-    } else if (currentSlide < slideCount) {
-      const slideTranslate = (currentSlide + 1) * 100
-
-      listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
-      setCurrentSlide(currentSlide + 1)
-    } else if (restartOnEnd) {
-      listRef.current.style.transform = `translate3d(0, 0, 0)`
-
-      setCurrentSlide(0)
     }
-  }
 
-  const getAbsoluteWidth = el => {
-    const margin = parseInt(
-      getComputedStyle(el)['margin-right'].replace('px', '')
-    )
-    const elementValues = el.getBoundingClientRect()
+    const nextHandler = event => {
+      if (infinity && !restartOnEnd) {
+        const itemWidth = getAbsoluteWidth(slideItemsEl[0])
+        const wrapperWidth = getAbsoluteWidth(wrapperRef.current)
+        const currentItemsEls =
+          listRef.current.querySelectorAll('.carousel__item')
+        const listWidth =
+          itemWidth.fullWidth * currentItemsEls.length -
+          itemWidth.margin -
+          listRef.current.style.left.replace(/px|-/g, '')
+        const currentCount = parseInt(listWidth / wrapperWidth.fullWidth)
+        const translationMultiplier =
+          currentSlide < 0 ? Math.abs(currentSlide) - 1 : currentSlide + 1
 
-    return {
-      fullWidth: elementValues.width,
-      margin
+        if (currentCount === currentSlide + 1) {
+          Array.from(slideItemsEl).forEach(elNode => {
+            const currentEls =
+              listRef.current.querySelectorAll('.carousel__item')
+
+            listRef.current.insertBefore(
+              elNode.cloneNode(true),
+              currentEls[currentEls.length - 1].nextSibling
+            )
+          })
+        }
+
+        listRef.current.style.transform = `translate3d(${
+          currentSlide < 0 ? '' : '-'
+        }${translationMultiplier * 100}%, 0, 0)`
+
+        setCurrentSlide(currentSlide + 1)
+      } else if (currentSlide < slideCount) {
+        const slideTranslate = (currentSlide + 1) * 100
+
+        listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
+        setCurrentSlide(currentSlide + 1)
+      } else if (restartOnEnd) {
+        listRef.current.style.transform = `translate3d(0, 0, 0)`
+
+        setCurrentSlide(0)
+      }
     }
-  }
 
-  const waitForElementWidth = async () => {
-    let resizeObserver = null
+    const getAbsoluteWidth = el => {
+      const margin = parseInt(
+        getComputedStyle(el)['margin-right'].replace('px', '')
+      )
+      const elementValues = el.getBoundingClientRect()
 
-    await new Promise(resolve => {
+      return {
+        fullWidth: elementValues.width,
+        margin
+      }
+    }
+
+    const waitForElementWidth = async () => {
+      let resizeObserver = null
+
+      await new Promise(resolve => {
+        let itemsEls = listRef.current.querySelectorAll('.carousel__item')
+
+        resizeObserver = new ResizeObserver(entries => {
+          for (const entry of entries) {
+            const { width } = entry.contentRect
+
+            if (width) {
+              resizeObserver.unobserve(itemsEls[0])
+              return resolve('rendered!')
+            }
+          }
+        })
+        resizeObserver.observe(itemsEls[0])
+      })
+    }
+
+    useEffect(async () => {
       let itemsEls = listRef.current.querySelectorAll('.carousel__item')
 
-      resizeObserver = new ResizeObserver(entries => {
-        for (const entry of entries) {
-          const { width } = entry.contentRect
+      if (childrenItems && itemsEls.length) {
+        let wrapperWidth = null
+        let listWidth = null
+        let elWidth = null
 
-          if (width) {
-            resizeObserver.unobserve(itemsEls[0])
-            return resolve('rendered!')
-          }
+        if (wrapperRef?.current) {
+          wrapperWidth = getAbsoluteWidth(wrapperRef.current)
         }
-      })
-      resizeObserver.observe(itemsEls[0])
-    })
-  }
 
-  useEffect(async () => {
-    let itemsEls = listRef.current.querySelectorAll('.carousel__item')
+        if (listRef?.current) {
+          let count = 0
+          elWidth = getAbsoluteWidth(itemsEls[0])
 
-    if (childrenItems && itemsEls.length) {
-      let wrapperWidth = null
-      let listWidth = null
-      let elWidth = null
+          if (!visilbleItems) {
+            if (elWidth.fullWidth === 0) {
+              await waitForElementWidth()
 
-      if (wrapperRef?.current) {
-        wrapperWidth = getAbsoluteWidth(wrapperRef.current)
+              elWidth = getAbsoluteWidth(itemsEls[0])
+            }
+
+            listWidth = elWidth.fullWidth * itemsEls.length - elWidth.margin
+            count = parseInt(listWidth / wrapperWidth.fullWidth)
+          } else {
+            count = parseInt(itemsEls.length / visilbleItems)
+            count = itemsEls.length % visilbleItems === 0 ? count - 1 : count
+          }
+
+          if (infinity && count === 0) {
+            const alowedQuant = wrapperWidth.fullWidth / elWidth.fullWidth
+
+            if (alowedQuant - itemsEls.length !== 0) {
+              Array.from(itemsEls).forEach(elNode => {
+                const currentEls =
+                  listRef.current.querySelectorAll('.carousel__item')
+
+                listRef.current.insertBefore(
+                  elNode.cloneNode(true),
+                  currentEls[currentEls.length - 1].nextSibling
+                )
+              })
+
+              itemsEls = listRef.current.querySelectorAll('.carousel__item')
+            }
+          }
+
+          setSlideCount(count)
+          setSlideItemsEl(itemsEls)
+        }
       }
+    }, [wrapperRef, listRef, visilbleItems, childrenItems])
 
-      if (listRef?.current) {
-        let count = 0
-        elWidth = getAbsoluteWidth(itemsEls[0])
-
-        if (!visilbleItems) {
-          if (elWidth.fullWidth === 0) {
-            await waitForElementWidth()
-
-            elWidth = getAbsoluteWidth(itemsEls[0])
-
-            // console.log('EL WIDTH', elWidth)
-            // console.log('EL FULL WIDTH', elWidth.fullWidth * itemsEls.length)
-            // console.log('LIST', listWidth)
-            // console.log('ITEMS', itemsEls.length)
-            // console.log('COUNT', listWidth / wrapperWidth.fullWidth)
-          }
-
-          listWidth = elWidth.fullWidth * itemsEls.length - elWidth.margin
-          count = parseInt(listWidth / wrapperWidth.fullWidth)
-        } else {
-          count = parseInt(itemsEls.length / visilbleItems)
-          count = itemsEls.length % visilbleItems === 0 ? count - 1 : count
+    useEffect(() => {
+      if (children && carouselRef?.current) {
+        if (width) {
+          carouselRef.current.style.width = width
         }
 
-        if (infinity && count === 0) {
-          const alowedQuant = wrapperWidth.fullWidth / elWidth.fullWidth
-          // console.log('AL?', alowedQuant)
-          // console.log('WP', wrapperWidth)
-          // console.log('EL?', elWidth)
+        const processedItems = children.map((item, index) => {
+          return React.cloneElement(item, {
+            key: index,
+            className: item.props.className + ' carousel__item',
+            style: {
+              ...item.style,
+              ...(visilbleItems
+                ? {
+                    minWidth: `${100 / visilbleItems}%`,
+                    marginRight: '0'
+                  }
+                : {}),
+              ...(height ? { height } : {})
+            }
+          })
+        })
 
-          if (alowedQuant - itemsEls.length !== 0) {
-            Array.from(itemsEls).forEach(elNode => {
-              const currentEls =
-                listRef.current.querySelectorAll('.carousel__item')
+        setChildrenItems(processedItems)
+      }
+    }, [children, wrapperRef, setChildrenItems])
 
-              listRef.current.insertBefore(
-                elNode.cloneNode(true),
-                currentEls[currentEls.length - 1].nextSibling
+    const buttonInactive = useCallback(
+      type => {
+        if (!infinity && !restartOnEnd) {
+          if (type === 'next') {
+            return currentSlide === slideCount
+          } else if (type === 'prev') {
+            return currentSlide === 0
+          }
+        }
+
+        return false
+      },
+      [currentSlide, slideCount, infinity, restartOnEnd]
+    )
+
+    useEffect(() => {
+      if (slideCount) {
+        const formated = currentSlide >= 0 ? currentSlide + 1 : currentSlide
+
+        setCurrentSlideFormated(formated)
+
+        if (onChange) {
+          onChange({
+            currentSlide: formated,
+            totalSlides: slideCount + 1
+          })
+        }
+      }
+    }, [currentSlide, slideCount])
+
+    const goToSlide = useCallback(
+      slideNumber => {
+        const insideNumber = slideNumber - 1
+
+        if (!infinity && insideNumber >= 0 && insideNumber <= slideCount) {
+          listRef.current.style.transform = `translate3d(-${
+            insideNumber * 100
+          }%, 0, 0)`
+          setCurrentSlide(insideNumber)
+        }
+      },
+      [infinity, slideCount, currentSlide]
+    )
+
+    useImperativeHandle(ref, () => ({
+      goToSlide
+    }))
+
+    return (
+      <div className="carousel" ref={carouselRef} {...rest}>
+        <div className="carousel__wrapper" ref={wrapperRef}>
+          <div className="carousel__list" ref={listRef}>
+            {childrenItems}
+          </div>
+        </div>
+
+        {showCurrentNumber && (
+          <div className="carousel__number">{currentSlideFormated}</div>
+        )}
+
+        {showNavigation && slideCount && !infinity && (
+          <div className="carousel__navigation">
+            {Array.from(Array(slideCount + 1).keys()).map((_, index) => {
+              return (
+                <button
+                  type="button"
+                  key={`navigation-${index}`}
+                  onClick={() => goToSlide(index + 1)}
+                  className={`carousel__navigation__number ${
+                    currentSlide === index
+                      ? 'carousel__navigation__number--current'
+                      : ''
+                  }`}
+                >
+                  {index + 1}
+                </button>
               )
-            })
+            })}
+          </div>
+        )}
 
-            itemsEls = listRef.current.querySelectorAll('.carousel__item')
-          }
-        }
-
-        setSlideCount(count)
-        setSlideItemsEl(itemsEls)
-      }
-    }
-  }, [wrapperRef, listRef, visilbleItems, childrenItems])
-
-  useEffect(() => {
-    if (children && carouselRef?.current) {
-      if (width) {
-        carouselRef.current.style.width = width
-      }
-
-      const processedItems = children.map((item, index) => {
-        return React.cloneElement(item, {
-          key: index,
-          className: item.props.className + ' carousel__item',
-          style: {
-            ...item.style,
-            ...(visilbleItems
-              ? {
-                  minWidth: `${100 / visilbleItems}%`,
-                  marginRight: '0'
-                }
-              : {}),
-            ...(height ? { height } : {})
-          }
-        })
-      })
-
-      setChildrenItems(processedItems)
-    }
-  }, [children, wrapperRef, setChildrenItems])
-
-  const buttonInactive = useCallback(
-    type => {
-      if (!infinity && !restartOnEnd) {
-        if (type === 'next') {
-          return currentSlide === slideCount
-        } else if (type === 'prev') {
-          return currentSlide === 0
-        }
-      }
-
-      return false
-    },
-    [currentSlide, slideCount, infinity, restartOnEnd]
-  )
-
-  useEffect(() => {
-    if (slideCount) {
-      const formated = currentSlide >= 0 ? currentSlide + 1 : currentSlide
-
-      setCurrentSlideFormated(formated)
-
-      if (onChange) {
-        onChange({
-          currentSlide: formated,
-          totalSlides: slideCount + 1
-        })
-      }
-    }
-  }, [currentSlide, slideCount])
-
-  return (
-    <div className="carousel" ref={carouselRef}>
-      <div className="carousel__wrapper" ref={wrapperRef}>
-        <div className="carousel__list" ref={listRef}>
-          {childrenItems}
+        <div className="carousel__actions">
+          <button
+            type="button"
+            onClick={prevHandler}
+            className={`carousel__actions__button ${
+              buttonInactive('prev')
+                ? 'carousel__actions__button--inactive'
+                : ''
+            }`}
+          >
+            Prev
+          </button>
+          <button
+            type="button"
+            onClick={nextHandler}
+            className={`carousel__actions__button ${
+              buttonInactive('next')
+                ? 'carousel__actions__button--inactive'
+                : ''
+            }`}
+          >
+            Next
+          </button>
         </div>
       </div>
+    )
+  }
+)
 
-      <div className="carousel__number">{currentSlideFormated}</div>
-
-      <div className="carousel__actions">
-        <button
-          type="button"
-          onClick={prevHandler}
-          className={`carousel__actions__button ${
-            buttonInactive('prev') ? 'carousel__actions__button--inactive' : ''
-          }`}
-        >
-          Prev
-        </button>
-        <button
-          type="button"
-          onClick={nextHandler}
-          className={`carousel__actions__button ${
-            buttonInactive('next') ? 'carousel__actions__button--inactive' : ''
-          }`}
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  )
-}
+Carousel.displayName = 'Carousel'
 
 Carousel.propTypes = {
   visilbleItems: PropTypes.number,
@@ -292,7 +347,9 @@ Carousel.propTypes = {
   children: PropTypes.array,
   height: PropTypes.string,
   width: PropTypes.string,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
+  showCurrentNumber: PropTypes.bool,
+  showNavigation: PropTypes.bool
 }
 
 export default Carousel
