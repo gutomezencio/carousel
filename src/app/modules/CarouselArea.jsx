@@ -47,6 +47,8 @@ const CarouselArea = () => {
   const [goToSlideValue, setGoToSlideValue] = useState()
   const goToSlideExample = useRef(null)
 
+  const customPrevAndNextRef = useRef(null)
+
   return (
     <div className="carousel-area">
       <div className="carousel-area__item">
@@ -160,6 +162,32 @@ const CarouselArea = () => {
         <Carousel visilbleItems={2} restartOnEnd={true} hideActions={true}>
           {generateItems(5)}
         </Carousel>
+      </div>
+
+      <div className="carousel-area__item">
+        <h2>Custom Next and Prev</h2>
+        <Carousel
+          visilbleItems={2}
+          restartOnEnd={true}
+          hideActions={true}
+          ref={customPrevAndNextRef}
+        >
+          {generateItems(5)}
+        </Carousel>
+        <button
+          type="button>"
+          className="carousel-area__left-arrow"
+          onClick={() => customPrevAndNextRef.current.previous()}
+        >
+          {'<'}
+        </button>
+        <button
+          type="button>"
+          className="carousel-area__right-arrow"
+          onClick={() => customPrevAndNextRef.current.next()}
+        >
+          {'>'}
+        </button>
       </div>
     </div>
   )

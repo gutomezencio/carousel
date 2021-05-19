@@ -273,7 +273,9 @@ const Carousel = forwardRef(
     )
 
     useImperativeHandle(ref, () => ({
-      goToSlide
+      goToSlide,
+      previous: prevHandler,
+      next: nextHandler
     }))
 
     return (
