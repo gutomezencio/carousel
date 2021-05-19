@@ -17,7 +17,7 @@ const CarouselArea = () => {
     'https://picsum.photos/id/199'
   ]
 
-  const generateItems = (quant, customSize) => {
+  const generateItems = (quant, customSize, text) => {
     return carouselItems?.slice(0, quant)?.map((image, index) => {
       return (
         <div className="some-class" key={index}>
@@ -25,6 +25,14 @@ const CarouselArea = () => {
             src={`${image}/${customSize || '/300/300'}`}
             alt={`image-${index}`}
           />
+          {text && (
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
+              dictum dolor non porta mollis. In tincidunt velit in tellus
+              tristique scelerisque sed eget ligula. Nulla quam risus, consequat
+              sit amet ex non, pharetra aliquet neque.
+            </p>
+          )}
         </div>
       )
     })
@@ -52,6 +60,13 @@ const CarouselArea = () => {
         <h2>Auto Height and Width</h2>
         <Carousel visilbleItems={1} height={'auto'} width={'auto'}>
           {generateItems(9, '/500/500')}
+        </Carousel>
+      </div>
+
+      <div className="carousel-area__item">
+        <h2>Image and Text and one Visible Slide</h2>
+        <Carousel visilbleItems={1} height={'400px'} width={'600px'}>
+          {generateItems(9, null, true)}
         </Carousel>
       </div>
 
