@@ -30,90 +30,100 @@ const Carousel = forwardRef(
     const carouselRef = useRef()
     const wrapperRef = useRef()
     const listRef = useRef()
+    const componentRef = useRef()
+
     const [currentSlide, setCurrentSlide] = useState(0)
     const [slideCount, setSlideCount] = useState(null)
     const [slideItemsEl, setSlideItemsEl] = useState(null)
     const [childrenItems, setChildrenItems] = useState(null)
     const [currentSlideFormated, setCurrentSlideFormated] = useState()
 
-    const prevHandler = event => {
-      if (currentSlide > 0) {
-        const slideTranslate = (currentSlide - 1) * 100
-        listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
+    const prevHandler = useCallback(
+      event => {
+        if (currentSlide > 0) {
+          const slideTranslate = (currentSlide - 1) * 100
+          listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
 
-        setCurrentSlide(currentSlide - 1)
-      } else if (infinity && !restartOnEnd) {
-        const itemWidth = getAbsoluteWidth(slideItemsEl[0])
-        const cloneQuant = slideItemsEl.length
-        const leftMultiplier = currentSlide ? Math.abs(currentSlide) + 1 : 1
+          setCurrentSlide(currentSlide - 1)
+        } else if (infinity && !restartOnEnd) {
+          const itemWidth = getAbsoluteWidth(slideItemsEl[0])
+          const cloneQuant = slideItemsEl.length
+          const leftMultiplier = currentSlide ? Math.abs(currentSlide) + 1 : 1
 
-        listRef.current.style.left = `-${
-          (itemWidth.fullWidth + itemWidth.margin) * leftMultiplier * cloneQuant
-        }px`
+          listRef.current.style.left = `-${
+            (itemWidth.fullWidth + itemWidth.margin) *
+            leftMultiplier *
+            cloneQuant
+          }px`
 
-        Array.from(slideItemsEl)
-          .reverse()
-          .forEach(elNode => {
-            listRef.current.insertBefore(
-              elNode.cloneNode(true),
-              listRef.current.querySelectorAll('.carousel__item')[0]
-            )
-          })
+          Array.from(slideItemsEl)
+            .reverse()
+            .forEach(elNode => {
+              listRef.current.insertBefore(
+                elNode.cloneNode(true),
+                listRef.current.querySelectorAll('.carousel__item')[0]
+              )
+            })
 
-        listRef.current.style.transform = `translate3d(${
-          leftMultiplier * 100
-        }%, 0, 0)`
-        setCurrentSlide(currentSlide - 1)
-      } else if (restartOnEnd) {
-        const slideTranslate = slideCount * 100
+          listRef.current.style.transform = `translate3d(${
+            leftMultiplier * 100
+          }%, 0, 0)`
+          setCurrentSlide(currentSlide - 1)
+        } else if (restartOnEnd) {
+          const slideTranslate = slideCount * 100
 
-        listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
-        setCurrentSlide(slideCount)
-      }
-    }
-
-    const nextHandler = event => {
-      if (infinity && !restartOnEnd) {
-        const itemWidth = getAbsoluteWidth(slideItemsEl[0])
-        const wrapperWidth = getAbsoluteWidth(wrapperRef.current)
-        const currentItemsEls =
-          listRef.current.querySelectorAll('.carousel__item')
-        const listWidth =
-          itemWidth.fullWidth * currentItemsEls.length -
-          itemWidth.margin -
-          listRef.current.style.left.replace(/px|-/g, '')
-        const currentCount = parseInt(listWidth / wrapperWidth.fullWidth)
-        const translationMultiplier =
-          currentSlide < 0 ? Math.abs(currentSlide) - 1 : currentSlide + 1
-
-        if (currentCount === currentSlide + 1) {
-          Array.from(slideItemsEl).forEach(elNode => {
-            const currentEls =
-              listRef.current.querySelectorAll('.carousel__item')
-
-            listRef.current.insertBefore(
-              elNode.cloneNode(true),
-              currentEls[currentEls.length - 1].nextSibling
-            )
-          })
+          listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
+          setCurrentSlide(slideCount)
         }
+      },
+      [currentSlide, slideCount, listRef, slideItemsEl]
+    )
 
-        listRef.current.style.transform = `translate3d(${
-          currentSlide < 0 ? '' : '-'
-        }${translationMultiplier * 100}%, 0, 0)`
+    const nextHandler = useCallback(
+      event => {
+        if (infinity && !restartOnEnd) {
+          const itemWidth = getAbsoluteWidth(slideItemsEl[0])
+          const wrapperWidth = getAbsoluteWidth(wrapperRef.current)
+          const currentItemsEls =
+            listRef.current.querySelectorAll('.carousel__item')
+          const listWidth =
+            itemWidth.fullWidth * currentItemsEls.length -
+            itemWidth.margin -
+            listRef.current.style.left.replace(/px|-/g, '')
+          const currentCount = parseInt(listWidth / wrapperWidth.fullWidth)
+          const translationMultiplier =
+            currentSlide < 0 ? Math.abs(currentSlide) - 1 : currentSlide + 1
 
-        setCurrentSlide(currentSlide + 1)
-      } else if (currentSlide < slideCount) {
-        const slideTranslate = (currentSlide + 1) * 100
+          if (currentCount === currentSlide + 1) {
+            Array.from(slideItemsEl).forEach(elNode => {
+              const currentEls =
+                listRef.current.querySelectorAll('.carousel__item')
 
-        listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
-        setCurrentSlide(currentSlide + 1)
-      } else if (restartOnEnd) {
-        listRef.current.style.transform = `translate3d(0, 0, 0)`
+              listRef.current.insertBefore(
+                elNode.cloneNode(true),
+                currentEls[currentEls.length - 1].nextSibling
+              )
+            })
+          }
 
-        setCurrentSlide(0)
-      }
-    }
+          listRef.current.style.transform = `translate3d(${
+            currentSlide < 0 ? '' : '-'
+          }${translationMultiplier * 100}%, 0, 0)`
+
+          setCurrentSlide(currentSlide + 1)
+        } else if (currentSlide < slideCount) {
+          const slideTranslate = (currentSlide + 1) * 100
+
+          listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
+          setCurrentSlide(currentSlide + 1)
+        } else if (restartOnEnd) {
+          listRef.current.style.transform = `translate3d(0, 0, 0)`
+
+          setCurrentSlide(0)
+        }
+      },
+      [currentSlide, slideCount, slideItemsEl, wrapperRef, listRef]
+    )
 
     const getAbsoluteWidth = el => {
       const margin = parseInt(
@@ -258,6 +268,49 @@ const Carousel = forwardRef(
       }
     }, [currentSlide, slideCount])
 
+    useEffect(() => {
+      if (wrapperRef.current) {
+        let positions = {
+          x: null,
+          y: null
+        }
+
+        const startEventHandler = ({ changedTouches }) => {
+          const { clientX: x, clientY: y } = changedTouches[0]
+
+          positions = {
+            x,
+            y
+          }
+        }
+
+        const endEventHandler = ({ changedTouches }) => {
+          const { clientX: x, clientY: y } = changedTouches[0]
+          const distanceX = Math.abs(x - positions.x)
+          const distanceY = Math.abs(y - positions.y)
+
+          if (distanceX > 15 && distanceY < 100) {
+            if (x < positions.x) {
+              componentRef.current.nextHandler()
+            } else if (x > positions.x) {
+              componentRef.current.prevHandler()
+            }
+          }
+        }
+
+        wrapperRef.current.addEventListener('touchstart', startEventHandler)
+        wrapperRef.current.addEventListener('touchend', endEventHandler)
+
+        return () => {
+          wrapperRef.current.removeEventListener(
+            'touchstart',
+            startEventHandler
+          )
+          wrapperRef.current.removeEventListener('touchend', endEventHandler)
+        }
+      }
+    }, [])
+
     const goToSlide = useCallback(
       slideNumber => {
         const insideNumber = slideNumber - 1
@@ -271,6 +324,11 @@ const Carousel = forwardRef(
       },
       [infinity, slideCount, currentSlide]
     )
+
+    useImperativeHandle(componentRef, () => ({
+      prevHandler,
+      nextHandler
+    }))
 
     useImperativeHandle(ref, () => ({
       goToSlide,

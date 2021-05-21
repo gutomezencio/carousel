@@ -7,5 +7,17 @@
     /deep/ .carousel {
       margin: 0 auto;
     }
+
+    &--hide-desktop {
+      @media (min-width: 801px) {
+        display: none;
+      }
+    }
+
+    &--hide-mobile {
+      @media (max-width: 800px) {
+        display: none;
+      }
+    }
   }
 }

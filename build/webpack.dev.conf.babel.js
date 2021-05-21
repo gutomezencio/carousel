@@ -45,6 +45,7 @@ export default {
     filename: 'index.js'
   },
   devServer: {
+    host: '0.0.0.0',
     clientLogLevel: 'warning',
     contentBase: '/',
     port: 4000,

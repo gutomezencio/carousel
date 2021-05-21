@@ -52,24 +52,36 @@ const CarouselArea = () => {
   return (
     <div className="carousel-area">
       <div className="carousel-area__item">
-        <h2>Custom Width</h2>
-        <Carousel visilbleItems={1} height={'auto'} width={'500px'}>
-          {generateItems(9)}
-        </Carousel>
-      </div>
-
-      <div className="carousel-area__item">
         <h2>Auto Height and Width</h2>
         <Carousel visilbleItems={1} height={'auto'} width={'auto'}>
           {generateItems(9, '/500/500')}
         </Carousel>
       </div>
 
-      <div className="carousel-area__item">
+      <div className="carousel-area__item carousel-area__item--hide-mobile">
+        <h2>Custom Width</h2>
+        <Carousel visilbleItems={1} height={'auto'} width={'500px'}>
+          {generateItems(9)}
+        </Carousel>
+      </div>
+
+      <div className="carousel-area__item carousel-area__item--hide-desktop">
+        <h2>Custom Width</h2>
+        <Carousel visilbleItems={1} height={'auto'} width={'80%'}>
+          {generateItems(9)}
+        </Carousel>
+      </div>
+
+      <div className="carousel-area__item carousel-area__item--hide-mobile">
         <h2>Image and Text and one Visible Slide</h2>
         <Carousel visilbleItems={1} height={'400px'} width={'600px'}>
           {generateItems(9, null, true)}
         </Carousel>
+      </div>
+
+      <div className="carousel-area__item carousel-area__item--hide-desktop">
+        <h2>Image and Text and one Visible Slide</h2>
+        <Carousel visilbleItems={1}>{generateItems(9, null, true)}</Carousel>
       </div>
 
       <div className="carousel-area__item">
