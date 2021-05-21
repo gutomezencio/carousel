@@ -2,7 +2,7 @@
 
 ### How to run:
 
-First of all you need to install the dependences for this project, for that you could use `npm` or `yarn`:
+First of all you need to install the dependencies for this project, for that you could use `npm` or `yarn`:
 
 ```sh
 $ npm i
@@ -10,7 +10,7 @@ $ npm i
 $ yarn install
 ```
 
-After package dependencies installation you can go for the app runnin properly:
+After package dependencies installation you can go for the app running properly:
 
 ```sh
 $ npm run dev
@@ -22,7 +22,7 @@ The application will be available over <http://localhost:4000>
 
 ### Stack:
 
-The stack chosed for this project was:
+The stack chosen for this project was:
 
 - Webpack 5
 - React
@@ -33,7 +33,7 @@ The stack chosed for this project was:
 
 ### To-do
 
-- [ ] Add unit tests
-- [ ] Add E2E tests
-- [ ] Config a bundle for production
-- [ ] Publish this component / package over NPM
+- Add unit tests
+- Add E2E tests
+- Config a bundle for production
+- Publish this component / package to NPM
