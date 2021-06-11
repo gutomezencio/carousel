@@ -38,51 +38,19 @@ const Carousel = forwardRef(
     const [childrenItems, setChildrenItems] = useState(null)
     const [currentSlideFormated, setCurrentSlideFormated] = useState()
 
-    const prevHandler = useCallback(
-      event => {
-        if (currentSlide > 0) {
-          const slideTranslate = (currentSlide - 1) * 100
-          listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
-
-          setCurrentSlide(currentSlide - 1)
-        } else if (infinity && !restartOnEnd) {
-          const itemWidth = getAbsoluteWidth(slideItemsEl[0])
-          const cloneQuant = slideItemsEl.length
-          const leftMultiplier = currentSlide ? Math.abs(currentSlide) + 1 : 1
-
-          listRef.current.style.left = `-${
-            (itemWidth.fullWidth + itemWidth.margin) *
-            leftMultiplier *
-            cloneQuant
-          }px`
-
-          Array.from(slideItemsEl)
-            .reverse()
-            .forEach(elNode => {
-              listRef.current.insertBefore(
-                elNode.cloneNode(true),
-                listRef.current.querySelectorAll('.carousel__item')[0]
-              )
-            })
-
-          listRef.current.style.transform = `translate3d(${
-            leftMultiplier * 100
-          }%, 0, 0)`
-          setCurrentSlide(currentSlide - 1)
-        } else if (restartOnEnd) {
-          const slideTranslate = slideCount * 100
-
-          listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
-          setCurrentSlide(slideCount)
-        }
+    const setListTranslation = useCallback(
+      translationValue => {
+        listRef.current.style.transform = `translate3d(${translationValue}%, 0, 0)`
       },
-      [currentSlide, slideCount, listRef, slideItemsEl]
+      [listRef]
     )
 
-    const nextHandler = useCallback(
-      event => {
-        if (infinity && !restartOnEnd) {
-          const itemWidth = getAbsoluteWidth(slideItemsEl[0])
+    const infinityHandler = useCallback(
+      type => {
+        const itemWidth = getAbsoluteWidth(slideItemsEl[0])
+        let infinityCurrentSlide = currentSlide
+
+        if (type === 'next') {
           const wrapperWidth = getAbsoluteWidth(wrapperRef.current)
           const currentItemsEls =
             listRef.current.querySelectorAll('.carousel__item')
@@ -106,23 +74,72 @@ const Carousel = forwardRef(
             })
           }
 
-          listRef.current.style.transform = `translate3d(${
-            currentSlide < 0 ? '' : '-'
-          }${translationMultiplier * 100}%, 0, 0)`
+          setListTranslation(
+            `${currentSlide < 0 ? '' : '-'}${translationMultiplier * 100}`
+          )
 
-          setCurrentSlide(currentSlide + 1)
-        } else if (currentSlide < slideCount) {
-          const slideTranslate = (currentSlide + 1) * 100
+          infinityCurrentSlide = currentSlide + 1
+        } else if (type === 'prev') {
+          const cloneQuant = slideItemsEl.length
+          const leftMultiplier = currentSlide ? Math.abs(currentSlide) + 1 : 1
 
-          listRef.current.style.transform = `translate3d(-${slideTranslate}%, 0, 0)`
-          setCurrentSlide(currentSlide + 1)
-        } else if (restartOnEnd) {
-          listRef.current.style.transform = `translate3d(0, 0, 0)`
+          listRef.current.style.left = `-${
+            (itemWidth.fullWidth + itemWidth.margin) *
+            leftMultiplier *
+            cloneQuant
+          }px`
 
-          setCurrentSlide(0)
+          Array.from(slideItemsEl)
+            .reverse()
+            .forEach(elNode => {
+              listRef.current.insertBefore(
+                elNode.cloneNode(true),
+                listRef.current.querySelectorAll('.carousel__item')[0]
+              )
+            })
+
+          setListTranslation(leftMultiplier * 100)
+
+          infinityCurrentSlide = currentSlide - 1
+        }
+
+        setCurrentSlide(infinityCurrentSlide)
+      },
+      [
+        wrapperRef,
+        listRef,
+        currentSlide,
+        slideItemsEl,
+        setListTranslation,
+        setCurrentSlide
+      ]
+    )
+
+    const actionHandler = useCallback(
+      (event, type) => {
+        if (type === 'next') {
+          if (infinity && !restartOnEnd) {
+            infinityHandler(type)
+          } else if (currentSlide < slideCount) {
+            setListTranslation(`-${(currentSlide + 1) * 100}`)
+            setCurrentSlide(currentSlide + 1)
+          } else if (restartOnEnd) {
+            setListTranslation(0)
+            setCurrentSlide(0)
+          }
+        } else if (type === 'prev') {
+          if (currentSlide > 0) {
+            setListTranslation(`-${(currentSlide - 1) * 100}`)
+            setCurrentSlide(currentSlide - 1)
+          } else if (restartOnEnd) {
+            setListTranslation(`-${slideCount * 100}`)
+            setCurrentSlide(slideCount)
+          } else if (infinity) {
+            infinityHandler(type)
+          }
         }
       },
-      [currentSlide, slideCount, slideItemsEl, wrapperRef, listRef]
+      [currentSlide, slideCount, infinityHandler, setCurrentSlide]
     )
 
     const getAbsoluteWidth = el => {
@@ -137,23 +154,21 @@ const Carousel = forwardRef(
       }
     }
 
-    const waitForElementWidth = async () => {
+    const waitForElementWidth = async itemEl => {
       let resizeObserver = null
 
       await new Promise(resolve => {
-        let itemsEls = listRef.current.querySelectorAll('.carousel__item')
-
         resizeObserver = new ResizeObserver(entries => {
           for (const entry of entries) {
             const { width } = entry.contentRect
 
             if (width) {
-              resizeObserver.unobserve(itemsEls[0])
+              resizeObserver.unobserve(itemEl)
               return resolve('rendered!')
             }
           }
         })
-        resizeObserver.observe(itemsEls[0])
+        resizeObserver.observe(itemEl)
       })
     }
 
@@ -175,7 +190,7 @@ const Carousel = forwardRef(
 
           if (!visilbleItems) {
             if (elWidth.fullWidth === 0) {
-              await waitForElementWidth()
+              await waitForElementWidth(itemsEls[0])
 
               elWidth = getAbsoluteWidth(itemsEls[0])
             }
@@ -326,14 +341,14 @@ const Carousel = forwardRef(
     )
 
     useImperativeHandle(componentRef, () => ({
-      prevHandler,
-      nextHandler
+      prevHandler: () => actionHandler(null, 'prev'),
+      nextHandler: () => actionHandler(null, 'next')
     }))
 
     useImperativeHandle(ref, () => ({
       goToSlide,
-      previous: prevHandler,
-      next: nextHandler
+      previous: () => actionHandler(null, 'prev'),
+      next: () => actionHandler(null, 'next')
     }))
 
     return (
@@ -373,7 +388,7 @@ const Carousel = forwardRef(
           <div className="carousel__actions">
             <button
               type="button"
-              onClick={prevHandler}
+              onClick={event => actionHandler(event, 'prev')}
               className={`carousel__actions__button ${
                 buttonInactive('prev')
                   ? 'carousel__actions__button--inactive'
@@ -384,7 +399,7 @@ const Carousel = forwardRef(
             </button>
             <button
               type="button"
-              onClick={nextHandler}
+              onClick={event => actionHandler(event, 'next')}
               className={`carousel__actions__button ${
                 buttonInactive('next')
                   ? 'carousel__actions__button--inactive'

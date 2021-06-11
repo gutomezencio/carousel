@@ -13,11 +13,11 @@
     backface-visibility: hidden;
     position: relative;
     align-items: flex-start;
+    will-change: transform, left;
   }
 
   /deep/ &__item {
     margin-right: 5px;
-    transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
     text-align: center;
   }
