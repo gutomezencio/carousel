@@ -16,7 +16,7 @@
     will-change: transform, left;
   }
 
-  /deep/ &__item {
+  & ::v-deep &__item {
     margin-right: 5px;
     backface-visibility: hidden;
     text-align: center;
