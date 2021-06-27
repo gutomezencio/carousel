@@ -38,6 +38,13 @@ const Carousel = forwardRef(
     const [childrenItems, setChildrenItems] = useState(null)
     const [currentSlideFormated, setCurrentSlideFormated] = useState()
     const [mobilePositions, setMobilePositions] = useState({})
+    const [isSwiping, setIsSwiping] = useState({
+      active: false,
+      firstX: null,
+      firstY: null,
+      currentTranslate: null,
+      swipeClass: false
+    })
 
     const setListTranslation = useCallback(
       translationValue => {
@@ -108,8 +115,16 @@ const Carousel = forwardRef(
       } else if (restartOnEnd) {
         setListTranslation(0)
         setCurrentSlide(0)
+      } else if (isSwiping.active) {
+        setListTranslation(`-${currentSlide * 100}`)
       }
-    }, [currentSlide, slideCount, setCurrentSlide, infinityNextHandler])
+    }, [
+      currentSlide,
+      slideCount,
+      isSwiping,
+      setCurrentSlide,
+      infinityNextHandler
+    ])
 
     const prevHandler = useCallback(() => {
       if (currentSlide > 0) {
@@ -120,8 +135,17 @@ const Carousel = forwardRef(
         setCurrentSlide(slideCount)
       } else if (infinity) {
         infinityPrevHandler()
+      } else if (isSwiping.active) {
+        console.log('PREV!')
+        setListTranslation('0')
       }
-    }, [currentSlide, slideCount, setCurrentSlide, infinityPrevHandler])
+    }, [
+      currentSlide,
+      slideCount,
+      isSwiping,
+      setCurrentSlide,
+      infinityPrevHandler
+    ])
 
     const getAbsoluteWidth = el => {
       const margin = parseInt(
@@ -291,57 +315,157 @@ const Carousel = forwardRef(
       },
       [infinity, slideCount, currentSlide]
     )
-    const touchEndEventHandler = ({ changedTouches }) => {
-      const { clientX: x, clientY: y } = changedTouches[0]
-      const distanceX = Math.abs(x - mobilePositions.x)
-      const distanceY = Math.abs(y - mobilePositions.y)
+
+    const swipeStartHandler = event => {
+      // event.preventDefault()
+
+      const style = window.getComputedStyle(listRef.current)
+      const matrix = new DOMMatrixReadOnly(style.transform)
+      const firstX = event.screenX || event.changedTouches[0].clientX
+      const currentTranslate = matrix.m41
+
+      setIsSwiping({
+        active: true,
+        firstX,
+        firstY: event.changedTouches?.[0].clientY,
+        currentTranslate
+      })
+
+      // listRef.current.style.transform = `translate3d(${currentTranslate}px, 0, 0)`
+    }
+
+    const touchEndHandler = changedTouches => {
+      console.log('TOUCH END')
+      const { clientX: x, clientY: y } = changedTouches
+      const distanceX = Math.abs(x - isSwiping.firstX)
+      const distanceY = Math.abs(y - isSwiping.firstY)
 
       if (distanceX > 15 && distanceY < 100) {
-        if (x < mobilePositions.x) {
+        if (x < isSwiping.firstX) {
           componentRef.current.nextHandler()
-        } else if (x > mobilePositions.x) {
+        } else if (x > isSwiping.firstX) {
           componentRef.current.prevHandler()
         }
       }
     }
 
-    const touchStartEventHandler = ({ changedTouches }) => {
-      const { clientX: x, clientY: y } = changedTouches[0]
-      const newPositions = {
-        x,
-        y
-      }
+    const swipeMoveHandler = event => {
+      if (isSwiping.active) {
+        if (!isSwiping.swipeClass) {
+          setIsSwiping(lastState => ({
+            ...lastState,
+            swipeClass: true
+          }))
+        }
 
-      setMobilePositions(value => ({
-        ...value,
-        ...newPositions
-      }))
+        const eventX = event.screenX || event.changedTouches[0].clientX
+        const currentX = eventX - isSwiping.firstX
+
+        console.log(
+          'Y',
+          Math.abs(event.changedTouches[0].clientY - isSwiping.firstY)
+        )
+        console.log(
+          'X',
+          Math.abs(event.changedTouches[0].clientX - isSwiping.firstX)
+        )
+
+        if (
+          !event.screenX &&
+          Math.abs(event.changedTouches[0].clientY - isSwiping.firstY) > 150
+        ) {
+          console.log('NO SW')
+          return false
+        }
+
+        console.log('TRANS?')
+
+        listRef.current.style.transform = `translate3d(${
+          isSwiping.currentTranslate + currentX
+        }px, 0, 0)`
+      }
     }
-    const touchEventsRegister = () => {
-      wrapperRef.current.addEventListener('touchstart', event =>
-        componentRef.current.touchStartEventHandler(event)
-      )
-      wrapperRef.current.addEventListener('touchend', event =>
-        componentRef.current.touchEndEventHandler(event)
-      )
+
+    const swipeEndHandler = event => {
+      if (isSwiping.active) {
+        // event.preventDefault()
+
+        if (event.screenX) {
+          if (event.screenX - isSwiping.firstX > 0) {
+            componentRef.current.prevHandler()
+          } else {
+            componentRef.current.nextHandler()
+          }
+        } else {
+          touchEndHandler(event.changedTouches[0])
+        }
+
+        setIsSwiping({
+          active: false,
+          firstX: null,
+          firstY: null,
+          currentTranslate: null,
+          swipeClass: false
+        })
+      }
+    }
+
+    const swipeEventListener = () => {
+      wrapperRef.current.addEventListener('mousedown', event => {
+        componentRef.current.swipeStartHandler(event)
+      })
+      wrapperRef.current.addEventListener('mousemove', event => {
+        componentRef.current.swipeMoveHandler(event)
+      })
+      wrapperRef.current.addEventListener('mouseup', event => {
+        componentRef.current.swipeEndHandler(event)
+      })
 
       return () => {
-        wrapperRef.current.removeEventListener('touchstart', event =>
-          componentRef.current.touchStartEventHandler(event)
-        )
-        wrapperRef.current.removeEventListener('touchend', event =>
-          componentRef.current.touchEndEventHandler(event)
-        )
+        wrapperRef.current.removeEventListener('mousedown', event => {
+          componentRef.current.swipeStartHandler(event)
+        })
+        wrapperRef.current.removeEventListener('mousemove', event => {
+          componentRef.current.swipeMoveHandler(event)
+        })
+        wrapperRef.current.removeEventListener('mouseup', event => {
+          componentRef.current.swipeEndHandler(event)
+        })
+      }
+    }
+    const touchEventListener = () => {
+      wrapperRef.current.addEventListener('touchstart', event => {
+        componentRef.current.swipeStartHandler(event)
+      })
+      wrapperRef.current.addEventListener('touchmove', event => {
+        componentRef.current.swipeMoveHandler(event)
+      })
+      wrapperRef.current.addEventListener('touchend', event => {
+        componentRef.current.swipeEndHandler(event)
+      })
+
+      return () => {
+        wrapperRef.current.removeEventListener('touchstart', event => {
+          componentRef.current.swipeStartHandler(event)
+        })
+        wrapperRef.current.removeEventListener('touchmove', event => {
+          componentRef.current.swipeMoveHandler(event)
+        })
+        wrapperRef.current.removeEventListener('touchend', event => {
+          componentRef.current.swipeEndHandler(event)
+        })
       }
     }
 
-    useEffect(touchEventsRegister, [])
+    useEffect(swipeEventListener, [])
+    useEffect(touchEventListener, [])
 
     useImperativeHandle(componentRef, () => ({
       prevHandler,
       nextHandler,
-      touchStartEventHandler,
-      touchEndEventHandler
+      swipeStartHandler,
+      swipeMoveHandler,
+      swipeEndHandler
     }))
 
     useImperativeHandle(ref, () => ({
@@ -353,7 +477,12 @@ const Carousel = forwardRef(
     return (
       <div className="carousel" ref={carouselRef} {...rest}>
         <div className="carousel__wrapper" ref={wrapperRef}>
-          <div className="carousel__list" ref={listRef}>
+          <div
+            className={`carousel__list ${
+              isSwiping.swipeClass ? 'carousel__list--swipping' : ''
+            }`}
+            ref={listRef}
+          >
             {childrenItems}
           </div>
         </div>
