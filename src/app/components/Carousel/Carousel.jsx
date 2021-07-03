@@ -10,19 +10,21 @@ import PropTypes from 'prop-types'
 
 import './Carousel.scoped.scss'
 
+// TO-DO - set default props values
+
 const Carousel = forwardRef(
   (
     {
       children,
-      visilbleItems,
-      infinity,
-      restartOnEnd,
+      visibleItems,
+      infinity = false,
+      restartOnEnd = false,
+      onChange = () => {},
+      showCurrentNumber = false,
+      showNavigation = false,
+      hideActions = false,
       height,
       width,
-      onChange,
-      showCurrentNumber,
-      showNavigation,
-      hideActions,
       ...rest
     },
     ref
@@ -36,8 +38,7 @@ const Carousel = forwardRef(
     const [slideCount, setSlideCount] = useState(null)
     const [slideItemsEl, setSlideItemsEl] = useState(null)
     const [childrenItems, setChildrenItems] = useState(null)
-    const [currentSlideFormated, setCurrentSlideFormated] = useState()
-    const [mobilePositions, setMobilePositions] = useState({})
+    const [currentSlideFormatted, setCurrentSlideFormatted] = useState(null)
     const [isSwiping, setIsSwiping] = useState({
       active: false,
       firstX: null,
@@ -57,15 +58,13 @@ const Carousel = forwardRef(
       const itemWidth = getAbsoluteWidth(slideItemsEl[0])
       const wrapperWidth = getAbsoluteWidth(wrapperRef.current)
 
-      const currentItemsEls =
-        listRef.current.querySelectorAll('.carousel__item')
+      const currentItemsEls = listRef.current.querySelectorAll('.carousel__item')
       const listWidth =
         itemWidth.fullWidth * currentItemsEls.length -
         itemWidth.margin -
         listRef.current.style.left.replace(/px|-/g, '')
       const currentCount = parseInt(listWidth / wrapperWidth.fullWidth)
-      const translationMultiplier =
-        currentSlide < 0 ? Math.abs(currentSlide) - 1 : currentSlide + 1
+      const translationMultiplier = currentSlide < 0 ? Math.abs(currentSlide) - 1 : currentSlide + 1
 
       if (currentCount === currentSlide + 1) {
         Array.from(slideItemsEl).forEach(elNode => {
@@ -78,11 +77,9 @@ const Carousel = forwardRef(
         })
       }
 
-      setListTranslation(
-        `${currentSlide < 0 ? '' : '-'}${translationMultiplier * 100}`
-      )
+      setListTranslation(`${currentSlide < 0 ? '' : '-'}${translationMultiplier * 100}`)
       setCurrentSlide(currentSlide + 1)
-    }, [wrapperRef, listRef, currentSlide, slideItemsEl])
+    }, [slideItemsEl, currentSlide, setListTranslation])
 
     const infinityPrevHandler = useCallback(() => {
       const itemWidth = getAbsoluteWidth(slideItemsEl[0])
@@ -104,7 +101,7 @@ const Carousel = forwardRef(
 
       setListTranslation(leftMultiplier * 100)
       setCurrentSlide(currentSlide - 1)
-    }, [wrapperRef, listRef, currentSlide, slideItemsEl])
+    }, [slideItemsEl, currentSlide, setListTranslation])
 
     const nextHandler = useCallback(() => {
       if (infinity && !restartOnEnd) {
@@ -119,11 +116,13 @@ const Carousel = forwardRef(
         setListTranslation(`-${currentSlide * 100}`)
       }
     }, [
+      infinity,
+      restartOnEnd,
       currentSlide,
       slideCount,
-      isSwiping,
-      setCurrentSlide,
-      infinityNextHandler
+      isSwiping.active,
+      infinityNextHandler,
+      setListTranslation
     ])
 
     const prevHandler = useCallback(() => {
@@ -141,16 +140,16 @@ const Carousel = forwardRef(
       }
     }, [
       currentSlide,
+      restartOnEnd,
+      infinity,
+      isSwiping.active,
+      setListTranslation,
       slideCount,
-      isSwiping,
-      setCurrentSlide,
       infinityPrevHandler
     ])
 
     const getAbsoluteWidth = el => {
-      const margin = parseInt(
-        getComputedStyle(el)['margin-right'].replace('px', '')
-      )
+      const margin = parseInt(getComputedStyle(el)['margin-right'].replace('px', ''))
       const elementValues = el.getBoundingClientRect()
 
       return {
@@ -182,12 +181,11 @@ const Carousel = forwardRef(
         if (infinity && count === 0) {
           const wrapperWidth = getAbsoluteWidth(wrapperRef.current)
           const elWidth = getAbsoluteWidth(itemsEls[0])
-          const alowedQuant = wrapperWidth.fullWidth / elWidth.fullWidth
+          const allowedQuant = wrapperWidth.fullWidth / elWidth.fullWidth
 
-          if (alowedQuant - itemsEls.length !== 0) {
+          if (allowedQuant - itemsEls.length !== 0) {
             Array.from(itemsEls).forEach(elNode => {
-              const currentEls =
-                listRef.current.querySelectorAll('.carousel__item')
+              const currentEls = listRef.current.querySelectorAll('.carousel__item')
 
               listRef.current.insertBefore(
                 elNode.cloneNode(true),
@@ -204,16 +202,17 @@ const Carousel = forwardRef(
       [listRef]
     )
 
-    const initCarouselValues = async () => {
+    const initCarouselValues = useCallback(async () => {
+      console.log('HERE')
       let itemsEls = listRef.current.querySelectorAll('.carousel__item')
       const itemsLength = itemsEls.length
 
-      if (childrenItems && itemsLength) {
+      if (itemsLength) {
         let count = 0
         let elWidth = getAbsoluteWidth(itemsEls[0])
         const wrapperWidth = getAbsoluteWidth(wrapperRef.current)
 
-        if (!visilbleItems) {
+        if (!visibleItems) {
           if (elWidth.fullWidth === 0) {
             await waitForElementWidth(itemsEls[0])
 
@@ -223,8 +222,8 @@ const Carousel = forwardRef(
           let listWidth = elWidth.fullWidth * itemsLength - elWidth.margin
           count = parseInt(listWidth / wrapperWidth.fullWidth)
         } else {
-          count = parseInt(itemsLength / visilbleItems)
-          count = itemsLength % visilbleItems === 0 ? count - 1 : count
+          count = parseInt(itemsLength / visibleItems)
+          count = itemsLength % visibleItems === 0 ? count - 1 : count
         }
 
         itemsEls = checkAndInitInfinity(infinity, count, itemsEls)
@@ -232,14 +231,14 @@ const Carousel = forwardRef(
         setSlideCount(count)
         setSlideItemsEl(itemsEls)
       }
-    }
+    }, [visibleItems, checkAndInitInfinity, infinity])
 
-    useEffect(initCarouselValues, [
-      wrapperRef,
-      listRef,
-      visilbleItems,
-      childrenItems
-    ])
+    useEffect(() => {
+      if (childrenItems) {
+        initCarouselValues()
+      }
+      // console.log('CHANGED!')
+    }, [childrenItems, initCarouselValues])
 
     const initCarouselChildrens = () => {
       if (children && carouselRef?.current) {
@@ -253,9 +252,9 @@ const Carousel = forwardRef(
             className: item.props.className + ' carousel__item',
             style: {
               ...item.style,
-              ...(visilbleItems
+              ...(visibleItems
                 ? {
-                    minWidth: `${100 / visilbleItems}%`,
+                    minWidth: `${100 / visibleItems}%`,
                     marginRight: '0'
                   }
                 : {}),
@@ -268,7 +267,14 @@ const Carousel = forwardRef(
       }
     }
 
-    useEffect(initCarouselChildrens, [children, wrapperRef, setChildrenItems])
+    useEffect(initCarouselChildrens, [
+      children,
+      wrapperRef,
+      setChildrenItems,
+      width,
+      visibleItems,
+      height
+    ])
 
     const buttonInactive = useCallback(
       type => {
@@ -285,39 +291,33 @@ const Carousel = forwardRef(
       [currentSlide, slideCount, infinity, restartOnEnd]
     )
 
-    const onChangeHandler = () => {
-      if (slideCount) {
-        const formated = currentSlide >= 0 ? currentSlide + 1 : currentSlide
+    useEffect(() => {
+      const currentSlide = currentSlide >= 0 ? currentSlide + 1 : currentSlide
+      const totalSlides = slideCount ? slideCount + 1 : 0
 
-        setCurrentSlideFormated(formated)
+      setCurrentSlideFormatted(currentSlide)
 
-        if (onChange) {
-          onChange({
-            currentSlide: formated,
-            totalSlides: slideCount + 1
-          })
-        }
-      }
-    }
-
-    useEffect(onChangeHandler, [currentSlide, slideCount])
+      slideCount &&
+        onChange({
+          currentSlide,
+          totalSlides
+        })
+    }, [currentSlide, slideCount, onChange])
 
     const goToSlide = useCallback(
       slideNumber => {
         const insideNumber = slideNumber - 1
 
         if (!infinity && insideNumber >= 0 && insideNumber <= slideCount) {
-          listRef.current.style.transform = `translate3d(-${
-            insideNumber * 100
-          }%, 0, 0)`
+          listRef.current.style.transform = `translate3d(-${insideNumber * 100}%, 0, 0)`
           setCurrentSlide(insideNumber)
         }
       },
-      [infinity, slideCount, currentSlide]
+      [infinity, slideCount]
     )
 
     const swipeStartHandler = event => {
-      // event.preventDefault()
+      event.preventDefault()
 
       const style = window.getComputedStyle(listRef.current)
       const matrix = new DOMMatrixReadOnly(style.transform)
@@ -331,7 +331,7 @@ const Carousel = forwardRef(
         currentTranslate
       })
 
-      // listRef.current.style.transform = `translate3d(${currentTranslate}px, 0, 0)`
+      listRef.current.style.transform = `translate3d(${currentTranslate}px, 0, 0)`
     }
 
     const touchEndHandler = changedTouches => {
@@ -361,19 +361,10 @@ const Carousel = forwardRef(
         const eventX = event.screenX || event.changedTouches[0].clientX
         const currentX = eventX - isSwiping.firstX
 
-        console.log(
-          'Y',
-          Math.abs(event.changedTouches[0].clientY - isSwiping.firstY)
-        )
-        console.log(
-          'X',
-          Math.abs(event.changedTouches[0].clientX - isSwiping.firstX)
-        )
+        console.log('Y', Math.abs(event.changedTouches[0].clientY - isSwiping.firstY))
+        console.log('X', Math.abs(event.changedTouches[0].clientX - isSwiping.firstX))
 
-        if (
-          !event.screenX &&
-          Math.abs(event.changedTouches[0].clientY - isSwiping.firstY) > 150
-        ) {
+        if (!event.screenX && Math.abs(event.changedTouches[0].clientY - isSwiping.firstY) > 150) {
           console.log('NO SW')
           return false
         }
@@ -411,48 +402,54 @@ const Carousel = forwardRef(
     }
 
     const swipeEventListener = () => {
-      wrapperRef.current.addEventListener('mousedown', event => {
-        componentRef.current.swipeStartHandler(event)
+      const currentWrapper = wrapperRef.current
+      const currentComponent = componentRef.current
+
+      currentWrapper.addEventListener('mousedown', event => {
+        currentComponent.swipeStartHandler(event)
       })
-      wrapperRef.current.addEventListener('mousemove', event => {
-        componentRef.current.swipeMoveHandler(event)
+      currentWrapper.addEventListener('mousemove', event => {
+        currentComponent.swipeMoveHandler(event)
       })
-      wrapperRef.current.addEventListener('mouseup', event => {
-        componentRef.current.swipeEndHandler(event)
+      currentWrapper.addEventListener('mouseup', event => {
+        currentComponent.swipeEndHandler(event)
       })
 
       return () => {
-        wrapperRef.current.removeEventListener('mousedown', event => {
-          componentRef.current.swipeStartHandler(event)
+        currentWrapper.removeEventListener('mousedown', event => {
+          currentComponent.swipeStartHandler(event)
         })
-        wrapperRef.current.removeEventListener('mousemove', event => {
-          componentRef.current.swipeMoveHandler(event)
+        currentWrapper.removeEventListener('mousemove', event => {
+          currentComponent.swipeMoveHandler(event)
         })
-        wrapperRef.current.removeEventListener('mouseup', event => {
-          componentRef.current.swipeEndHandler(event)
+        currentWrapper.removeEventListener('mouseup', event => {
+          currentComponent.swipeEndHandler(event)
         })
       }
     }
     const touchEventListener = () => {
-      wrapperRef.current.addEventListener('touchstart', event => {
-        componentRef.current.swipeStartHandler(event)
+      const currentWrapper = wrapperRef.current
+      const currentComponent = componentRef.current
+
+      currentWrapper.addEventListener('touchstart', event => {
+        currentComponent.swipeStartHandler(event)
       })
-      wrapperRef.current.addEventListener('touchmove', event => {
-        componentRef.current.swipeMoveHandler(event)
+      currentWrapper.addEventListener('touchmove', event => {
+        currentComponent.swipeMoveHandler(event)
       })
-      wrapperRef.current.addEventListener('touchend', event => {
-        componentRef.current.swipeEndHandler(event)
+      currentWrapper.addEventListener('touchend', event => {
+        currentComponent.swipeEndHandler(event)
       })
 
       return () => {
-        wrapperRef.current.removeEventListener('touchstart', event => {
-          componentRef.current.swipeStartHandler(event)
+        currentWrapper.removeEventListener('touchstart', event => {
+          currentComponent.swipeStartHandler(event)
         })
-        wrapperRef.current.removeEventListener('touchmove', event => {
-          componentRef.current.swipeMoveHandler(event)
+        currentWrapper.removeEventListener('touchmove', event => {
+          currentComponent.swipeMoveHandler(event)
         })
-        wrapperRef.current.removeEventListener('touchend', event => {
-          componentRef.current.swipeEndHandler(event)
+        currentWrapper.removeEventListener('touchend', event => {
+          currentComponent.swipeEndHandler(event)
         })
       }
     }
@@ -478,17 +475,15 @@ const Carousel = forwardRef(
       <div className="carousel" ref={carouselRef} {...rest}>
         <div className="carousel__wrapper" ref={wrapperRef}>
           <div
-            className={`carousel__list ${
-              isSwiping.swipeClass ? 'carousel__list--swipping' : ''
-            }`}
+            className={`carousel__list ${isSwiping.swipeClass ? 'carousel__list--swiping' : ''}`}
             ref={listRef}
           >
             {childrenItems}
           </div>
         </div>
 
-        {showCurrentNumber && (
-          <div className="carousel__number">{currentSlideFormated}</div>
+        {showCurrentNumber && slideCount && (
+          <div className="carousel__number">{currentSlideFormatted}</div>
         )}
 
         {showNavigation && slideCount && !infinity && (
@@ -500,9 +495,7 @@ const Carousel = forwardRef(
                   key={`navigation-${index}`}
                   onClick={() => goToSlide(index + 1)}
                   className={`carousel__navigation__number ${
-                    currentSlide === index
-                      ? 'carousel__navigation__number--current'
-                      : ''
+                    currentSlide === index ? 'carousel__navigation__number--current' : ''
                   }`}
                 >
                   {index + 1}
@@ -518,20 +511,17 @@ const Carousel = forwardRef(
               type="button"
               onClick={event => prevHandler(event)}
               className={`carousel__actions__button ${
-                buttonInactive('prev')
-                  ? 'carousel__actions__button--inactive'
-                  : ''
+                buttonInactive('prev') ? 'carousel__actions__button--inactive' : ''
               }`}
             >
               Prev
             </button>
+
             <button
               type="button"
               onClick={event => nextHandler(event)}
               className={`carousel__actions__button ${
-                buttonInactive('next')
-                  ? 'carousel__actions__button--inactive'
-                  : ''
+                buttonInactive('next') ? 'carousel__actions__button--inactive' : ''
               }`}
             >
               Next
@@ -546,10 +536,10 @@ const Carousel = forwardRef(
 Carousel.displayName = 'Carousel'
 
 Carousel.propTypes = {
-  visilbleItems: PropTypes.number,
+  visibleItems: PropTypes.number,
   infinity: PropTypes.bool,
   restartOnEnd: PropTypes.bool,
-  children: PropTypes.array,
+  children: PropTypes.array.isRequired,
   height: PropTypes.string,
   width: PropTypes.string,
   onChange: PropTypes.func,

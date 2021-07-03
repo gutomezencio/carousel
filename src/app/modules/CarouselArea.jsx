@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 
 import './CarouselArea.scoped.scss'
 
@@ -21,16 +21,12 @@ const CarouselArea = () => {
     return carouselItems?.slice(0, quant)?.map((image, index) => {
       return (
         <div className="some-class" key={index}>
-          <img
-            src={`${image}/${customSize || '/300/300'}`}
-            alt={`image-${index}`}
-          />
+          <img src={`${image}/${customSize || '/300/300'}`} alt={`image-${index}`} />
           {text && (
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-              dictum dolor non porta mollis. In tincidunt velit in tellus
-              tristique scelerisque sed eget ligula. Nulla quam risus, consequat
-              sit amet ex non, pharetra aliquet neque.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam dictum dolor non porta
+              mollis. In tincidunt velit in tellus tristique scelerisque sed eget ligula. Nulla quam
+              risus, consequat sit amet ex non, pharetra aliquet neque.
             </p>
           )}
         </div>
@@ -40,9 +36,12 @@ const CarouselArea = () => {
 
   const [onChangeValues, setOnChangeValues] = useState('')
 
-  const onChangeCallback = values => {
-    setOnChangeValues(values)
-  }
+  const onChangeCallback = useCallback(
+    values => {
+      setOnChangeValues(values)
+    },
+    [setOnChangeValues]
+  )
 
   const [goToSlideValue, setGoToSlideValue] = useState()
   const goToSlideExample = useRef(null)
@@ -53,40 +52,40 @@ const CarouselArea = () => {
     <div className="carousel-area">
       <div className="carousel-area__item">
         <h2>Auto Height and Width</h2>
-        <Carousel visilbleItems={1} height={'auto'} width={'auto'}>
+        <Carousel visibleItems={1} height={'auto'} width={'auto'}>
           {generateItems(9, '/500/500')}
         </Carousel>
       </div>
 
       <div className="carousel-area__item carousel-area__item--hide-mobile">
         <h2>Custom Width</h2>
-        <Carousel visilbleItems={1} height={'auto'} width={'500px'}>
+        <Carousel visibleItems={1} height={'auto'} width={'500px'}>
           {generateItems(9)}
         </Carousel>
       </div>
 
       <div className="carousel-area__item carousel-area__item--hide-desktop">
         <h2>Custom Width</h2>
-        <Carousel visilbleItems={1} height={'auto'} width={'80%'}>
+        <Carousel visibleItems={1} height={'auto'} width={'80%'}>
           {generateItems(9)}
         </Carousel>
       </div>
 
       <div className="carousel-area__item carousel-area__item--hide-mobile">
         <h2>Image and Text and one Visible Slide</h2>
-        <Carousel visilbleItems={1} height={'400px'} width={'600px'}>
+        <Carousel visibleItems={1} height={'400px'} width={'600px'}>
           {generateItems(9, null, true)}
         </Carousel>
       </div>
 
       <div className="carousel-area__item carousel-area__item--hide-desktop">
         <h2>Image and Text and one Visible Slide</h2>
-        <Carousel visilbleItems={1}>{generateItems(9, null, true)}</Carousel>
+        <Carousel visibleItems={1}>{generateItems(9, null, true)}</Carousel>
       </div>
 
       <div className="carousel-area__item">
         <h2>Simple one Visible Slide</h2>
-        <Carousel visilbleItems={1}>{generateItems(9)}</Carousel>
+        <Carousel visibleItems={1}>{generateItems(9)}</Carousel>
       </div>
 
       <div className="carousel-area__item">
@@ -101,21 +100,19 @@ const CarouselArea = () => {
 
       <div className="carousel-area__item">
         <h2>Infinity with 5 Visible Slides</h2>
-        <Carousel visilbleItems={5} infinity={true}>
+        <Carousel visibleItems={5} infinity={true}>
           {generateItems(8)}
         </Carousel>
       </div>
 
       <div className="carousel-area__item">
-        <h2>
-          Infinity with less slides than available spaces for Visible Slides
-        </h2>
+        <h2>Infinity with less slides than available spaces for Visible Slides</h2>
         <Carousel infinity={true}>{generateItems(4)}</Carousel>
       </div>
 
       <div className="carousel-area__item">
         <h2>Restarting on end with 1 Visible Slide</h2>
-        <Carousel visilbleItems={1} restartOnEnd={true}>
+        <Carousel visibleItems={1} restartOnEnd={true}>
           {generateItems(9)}
         </Carousel>
       </div>
@@ -127,7 +124,7 @@ const CarouselArea = () => {
 
       <div className="carousel-area__item">
         <h2>Simple with Navigation</h2>
-        <Carousel restartOnEnd={true} showNavigation={true} visilbleItems={2}>
+        <Carousel restartOnEnd={true} showNavigation={true} visibleItems={2}>
           {generateItems(9)}
         </Carousel>
       </div>
@@ -137,17 +134,14 @@ const CarouselArea = () => {
         <Carousel
           restartOnEnd={true}
           ref={goToSlideExample}
-          visilbleItems={3}
+          visibleItems={3}
           showCurrentNumber={true}
         >
           {generateItems(9)}
         </Carousel>
         <p>
           Go to slide:
-          <input
-            type="text"
-            onChange={({ target }) => setGoToSlideValue(target.value)}
-          />
+          <input type="text" onChange={({ target }) => setGoToSlideValue(target.value)} />
           <button
             type="button"
             onClick={() => goToSlideExample?.current?.goToSlide(goToSlideValue)}
@@ -160,8 +154,8 @@ const CarouselArea = () => {
       <div className="carousel-area__item">
         <h2>Simple with On Change</h2>
         <Carousel
-          onChange={onChangeCallback}
-          visilbleItems={2}
+          onChange={value => console.log('OUT', value)}
+          visibleItems={2}
           restartOnEnd={true}
         >
           {generateItems(9)}
@@ -171,7 +165,7 @@ const CarouselArea = () => {
 
       <div className="carousel-area__item">
         <h2>Without actions</h2>
-        <Carousel visilbleItems={2} restartOnEnd={true} hideActions={true}>
+        <Carousel visibleItems={2} restartOnEnd={true} hideActions={true}>
           {generateItems(5)}
         </Carousel>
       </div>
@@ -179,7 +173,7 @@ const CarouselArea = () => {
       <div className="carousel-area__item">
         <h2>Custom Next and Prev</h2>
         <Carousel
-          visilbleItems={2}
+          visibleItems={2}
           restartOnEnd={true}
           hideActions={true}
           ref={customPrevAndNextRef}
