@@ -3,12 +3,5 @@ export default {
   slideCount: null,
   slideItemsEl: null,
   childrenItems: null,
-  currentSlideFormatted: null,
-  isSwiping: {
-    active: false,
-    firstX: null,
-    firstY: null,
-    currentTranslate: null,
-    swipeClass: false
-  }
+  currentSlideFormatted: null
 }

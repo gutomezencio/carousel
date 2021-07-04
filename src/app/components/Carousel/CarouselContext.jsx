@@ -35,15 +35,6 @@ const reducer = (state, action) => {
         currentSlideFormatted: action.payload
       }
     }
-    case 'SET_IS_SWIPING': {
-      return {
-        ...state,
-        isSwiping: {
-          ...state.isSwiping,
-          ...action.payload
-        }
-      }
-    }
   }
 
   return {
