@@ -245,14 +245,11 @@ const CarouselContent = forwardRef(
 
         {wrapperRef.current && listRef.current && (
           <CarouselActions
-            infinity={infinity}
-            restartOnEnd={restartOnEnd}
             applyListTranslation={applyListTranslation}
+            toggleSwipingClass={toggleSwipingClass}
             listRefCurrent={listRef.current}
             wrapperRefCurrent={wrapperRef.current}
             componentRef={ref}
-            toggleSwipingClass={toggleSwipingClass}
-            hideActions={hideActions}
             ref={actionRef}
           />
         )}

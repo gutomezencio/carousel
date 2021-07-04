@@ -14,18 +14,7 @@ import { getAbsoluteWidth } from 'app/utils'
 import './Carousel.scoped.scss'
 
 const CarouselActions = forwardRef(
-  (
-    {
-      infinity,
-      restartOnEnd,
-      applyListTranslation,
-      listRefCurrent,
-      wrapperRefCurrent,
-      toggleSwipingClass,
-      hideActions
-    },
-    ref
-  ) => {
+  ({ applyListTranslation, listRefCurrent, wrapperRefCurrent, toggleSwipingClass }, ref) => {
     const { dispatch, state } = useContext(CarouselContext)
     const instanceRef = useRef()
     const swipingControl = {
@@ -109,7 +98,7 @@ const CarouselActions = forwardRef(
 
     const nextHandler = useCallback(
       swiping => {
-        if (infinity && !restartOnEnd) {
+        if (state.config.infinity && !state.config.restartOnEnd) {
           infinityNextHandler()
         } else if (state.currentSlide < state.slideCount) {
           applyListTranslation(`-${(state.currentSlide + 1) * 100}`)
@@ -117,7 +106,7 @@ const CarouselActions = forwardRef(
             type: 'SET_CURRENT_SLIDE',
             payload: state.currentSlide + 1
           })
-        } else if (restartOnEnd) {
+        } else if (state.config.restartOnEnd) {
           applyListTranslation(0)
           dispatch({
             type: 'SET_CURRENT_SLIDE',
@@ -128,8 +117,8 @@ const CarouselActions = forwardRef(
         }
       },
       [
-        infinity,
-        restartOnEnd,
+        state.config.infinity,
+        state.config.restartOnEnd,
         state.currentSlide,
         state.slideCount,
         infinityNextHandler,
@@ -146,21 +135,21 @@ const CarouselActions = forwardRef(
             type: 'SET_CURRENT_SLIDE',
             payload: state.currentSlide - 1
           })
-        } else if (restartOnEnd) {
+        } else if (state.config.restartOnEnd) {
           applyListTranslation(`-${state.slideCount * 100}`)
           dispatch({
             type: 'SET_CURRENT_SLIDE',
             payload: state.slideCount
           })
-        } else if (infinity) {
+        } else if (state.config.infinity) {
           infinityPrevHandler()
         } else if (swiping) {
           applyListTranslation('0')
         }
       },
       [
-        infinity,
-        restartOnEnd,
+        state.config.infinity,
+        state.config.restartOnEnd,
         state.currentSlide,
         state.slideCount,
         applyListTranslation,
@@ -171,7 +160,7 @@ const CarouselActions = forwardRef(
 
     const buttonInactive = useCallback(
       type => {
-        if (!infinity && !restartOnEnd) {
+        if (!state.config.infinity && !state.config.restartOnEnd) {
           if (type === 'next') {
             return state.currentSlide === state.slideCount
           } else if (type === 'prev') {
@@ -181,7 +170,7 @@ const CarouselActions = forwardRef(
 
         return false
       },
-      [state.currentSlide, state.slideCount, infinity, restartOnEnd]
+      [state.currentSlide, state.slideCount, state.config.infinity, state.config.restartOnEnd]
     )
 
     const swipeStartHandler = event => {
@@ -217,7 +206,6 @@ const CarouselActions = forwardRef(
     }
 
     const swipeMoveHandler = event => {
-      // console.log('MOVE', swipingControl.state)
       if (swipingControl.state.active) {
         toggleSwipingClass(true)
 
@@ -243,8 +231,6 @@ const CarouselActions = forwardRef(
 
     const swipeEndHandler = event => {
       if (swipingControl.state.active) {
-        // event.preventDefault()
-
         if (event.screenX) {
           if (event.screenX - swipingControl.state.firstX > 0) {
             instanceRef.current.prevHandler(true)
@@ -303,7 +289,7 @@ const CarouselActions = forwardRef(
     }))
 
     return (
-      !hideActions && (
+      !state.config.hideActions && (
         <div className="carousel__actions">
           <button
             type="button"
@@ -340,8 +326,7 @@ CarouselActions.propTypes = {
   carouselRef: PropTypes.object,
   wrapperRefCurrent: PropTypes.object,
   componentRef: PropTypes.object,
-  toggleSwipingClass: PropTypes.func,
-  hideActions: PropTypes.bool
+  toggleSwipingClass: PropTypes.func
 }
 
 export default CarouselActions
