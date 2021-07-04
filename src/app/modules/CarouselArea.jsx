@@ -4,36 +4,36 @@ import './CarouselArea.scoped.scss'
 
 import Carousel from 'app/components/Carousel/Carousel'
 
+const carouselItems = [
+  'https://picsum.photos/id/111',
+  'https://picsum.photos/id/122',
+  'https://picsum.photos/id/133',
+  'https://picsum.photos/id/144',
+  'https://picsum.photos/id/155',
+  'https://picsum.photos/id/166',
+  'https://picsum.photos/id/177',
+  'https://picsum.photos/id/188',
+  'https://picsum.photos/id/199'
+]
+
+const GenerateItems = (quant, customSize, text) => {
+  return carouselItems?.slice(0, quant)?.map((image, index) => {
+    return (
+      <div className="some-class" key={index}>
+        <img src={`${image}/${customSize || '/300/300'}`} alt={`image-${index}`} />
+        {text && (
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam dictum dolor non porta
+            mollis. In tincidunt velit in tellus tristique scelerisque sed eget ligula. Nulla quam
+            risus, consequat sit amet ex non, pharetra aliquet neque.
+          </p>
+        )}
+      </div>
+    )
+  })
+}
+
 const CarouselArea = () => {
-  const carouselItems = [
-    'https://picsum.photos/id/111',
-    'https://picsum.photos/id/122',
-    'https://picsum.photos/id/133',
-    'https://picsum.photos/id/144',
-    'https://picsum.photos/id/155',
-    'https://picsum.photos/id/166',
-    'https://picsum.photos/id/177',
-    'https://picsum.photos/id/188',
-    'https://picsum.photos/id/199'
-  ]
-
-  const generateItems = (quant, customSize, text) => {
-    return carouselItems?.slice(0, quant)?.map((image, index) => {
-      return (
-        <div className="some-class" key={index}>
-          <img src={`${image}/${customSize || '/300/300'}`} alt={`image-${index}`} />
-          {text && (
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam dictum dolor non porta
-              mollis. In tincidunt velit in tellus tristique scelerisque sed eget ligula. Nulla quam
-              risus, consequat sit amet ex non, pharetra aliquet neque.
-            </p>
-          )}
-        </div>
-      )
-    })
-  }
-
   const [onChangeValues, setOnChangeValues] = useState('')
 
   const onChangeCallback = useCallback(
@@ -53,79 +53,79 @@ const CarouselArea = () => {
       <div className="carousel-area__item">
         <h2>Auto Height and Width</h2>
         <Carousel visibleItems={1} height={'auto'} width={'auto'}>
-          {generateItems(9, '/500/500')}
+          {GenerateItems(9, '/500/500')}
         </Carousel>
       </div>
 
-      <div className="carousel-area__item carousel-area__item--hide-mobile">
+      {/* <div className="carousel-area__item carousel-area__item--hide-mobile">
         <h2>Custom Width</h2>
         <Carousel visibleItems={1} height={'auto'} width={'500px'}>
-          {generateItems(9)}
+          {GenerateItems(9)}
         </Carousel>
       </div>
 
       <div className="carousel-area__item carousel-area__item--hide-desktop">
         <h2>Custom Width</h2>
         <Carousel visibleItems={1} height={'auto'} width={'80%'}>
-          {generateItems(9)}
+          {GenerateItems(9)}
         </Carousel>
       </div>
 
       <div className="carousel-area__item carousel-area__item--hide-mobile">
         <h2>Image and Text and one Visible Slide</h2>
         <Carousel visibleItems={1} height={'400px'} width={'600px'}>
-          {generateItems(9, null, true)}
+          {GenerateItems(9, null, true)}
         </Carousel>
       </div>
 
       <div className="carousel-area__item carousel-area__item--hide-desktop">
         <h2>Image and Text and one Visible Slide</h2>
-        <Carousel visibleItems={1}>{generateItems(9, null, true)}</Carousel>
+        <Carousel visibleItems={1}>{GenerateItems(9, null, true)}</Carousel>
       </div>
 
       <div className="carousel-area__item">
         <h2>Simple one Visible Slide</h2>
-        <Carousel visibleItems={1}>{generateItems(9)}</Carousel>
+        <Carousel visibleItems={1}>{GenerateItems(9)}</Carousel>
       </div>
 
       <div className="carousel-area__item">
         <h2>Without any Config</h2>
-        <Carousel>{generateItems(9)}</Carousel>
+        <Carousel>{GenerateItems(9)}</Carousel>
       </div>
 
       <div className="carousel-area__item">
         <h2>Simple Infinity</h2>
-        <Carousel infinity={true}>{generateItems(8)}</Carousel>
+        <Carousel infinity={true}>{GenerateItems(8)}</Carousel>
       </div>
 
       <div className="carousel-area__item">
         <h2>Infinity with 5 Visible Slides</h2>
         <Carousel visibleItems={5} infinity={true}>
-          {generateItems(8)}
+          {GenerateItems(8)}
         </Carousel>
       </div>
 
       <div className="carousel-area__item">
         <h2>Infinity with less slides than available spaces for Visible Slides</h2>
-        <Carousel infinity={true}>{generateItems(4)}</Carousel>
+        <Carousel infinity={true}>{GenerateItems(4)}</Carousel>
       </div>
 
       <div className="carousel-area__item">
         <h2>Restarting on end with 1 Visible Slide</h2>
         <Carousel visibleItems={1} restartOnEnd={true}>
-          {generateItems(9)}
+          {GenerateItems(9)}
         </Carousel>
       </div>
 
       <div className="carousel-area__item">
         <h2>Simple with Restarting on end</h2>
-        <Carousel restartOnEnd={true}>{generateItems(9)}</Carousel>
+        <Carousel restartOnEnd={true}>{GenerateItems(9)}</Carousel>
       </div>
 
       <div className="carousel-area__item">
         <h2>Simple with Navigation</h2>
         <Carousel restartOnEnd={true} showNavigation={true} visibleItems={2}>
-          {generateItems(9)}
+          {GenerateItems(9)}
         </Carousel>
       </div>
 
@@ -137,7 +137,7 @@ const CarouselArea = () => {
           visibleItems={3}
           showCurrentNumber={true}
         >
-          {generateItems(9)}
+          {GenerateItems(9)}
         </Carousel>
         <p>
           Go to slide:
@@ -158,7 +158,7 @@ const CarouselArea = () => {
           visibleItems={2}
           restartOnEnd={true}
         >
-          {generateItems(9)}
+          {GenerateItems(9)}
         </Carousel>
         <p>{JSON.stringify(onChangeValues)}</p>
       </div>
@@ -166,7 +166,7 @@ const CarouselArea = () => {
       <div className="carousel-area__item">
         <h2>Without actions</h2>
         <Carousel visibleItems={2} restartOnEnd={true} hideActions={true}>
-          {generateItems(5)}
+          {GenerateItems(5)}
         </Carousel>
       </div>
 
@@ -178,7 +178,7 @@ const CarouselArea = () => {
           hideActions={true}
           ref={customPrevAndNextRef}
         >
-          {generateItems(5)}
+          {GenerateItems(5)}
         </Carousel>
         <button
           type="button>"
@@ -194,7 +194,7 @@ const CarouselArea = () => {
         >
           {'>'}
         </button>
-      </div>
+      </div> */}
     </div>
   )
 }

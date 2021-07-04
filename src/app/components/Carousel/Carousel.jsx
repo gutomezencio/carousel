@@ -3,6 +3,7 @@ import React, {
   useRef,
   useState,
   useCallback,
+  useContext,
   forwardRef,
   useImperativeHandle
 } from 'react'
@@ -10,7 +11,9 @@ import PropTypes from 'prop-types'
 
 import './Carousel.scoped.scss'
 
-// TO-DO - set default props values
+import CarouselContextProvider, { CarouselContext } from './CarouselContext'
+
+import { getAbsoluteWidth, waitForElementWidth } from 'app/utils'
 
 const Carousel = forwardRef(
   (
@@ -29,6 +32,7 @@ const Carousel = forwardRef(
     },
     ref
   ) => {
+    const { dispatch, state } = useContext(CarouselContext)
     const carouselRef = useRef()
     const wrapperRef = useRef()
     const listRef = useRef()
@@ -47,7 +51,7 @@ const Carousel = forwardRef(
       swipeClass: false
     })
 
-    const setListTranslation = useCallback(
+    const applyListTranslation = useCallback(
       translationValue => {
         listRef.current.style.transform = `translate3d(${translationValue}%, 0, 0)`
       },
@@ -77,9 +81,9 @@ const Carousel = forwardRef(
         })
       }
 
-      setListTranslation(`${currentSlide < 0 ? '' : '-'}${translationMultiplier * 100}`)
+      applyListTranslation(`${currentSlide < 0 ? '' : '-'}${translationMultiplier * 100}`)
       setCurrentSlide(currentSlide + 1)
-    }, [slideItemsEl, currentSlide, setListTranslation])
+    }, [slideItemsEl, currentSlide, applyListTranslation])
 
     const infinityPrevHandler = useCallback(() => {
       const itemWidth = getAbsoluteWidth(slideItemsEl[0])
@@ -99,21 +103,21 @@ const Carousel = forwardRef(
           )
         })
 
-      setListTranslation(leftMultiplier * 100)
+      applyListTranslation(leftMultiplier * 100)
       setCurrentSlide(currentSlide - 1)
-    }, [slideItemsEl, currentSlide, setListTranslation])
+    }, [slideItemsEl, currentSlide, applyListTranslation])
 
     const nextHandler = useCallback(() => {
       if (infinity && !restartOnEnd) {
         infinityNextHandler()
       } else if (currentSlide < slideCount) {
-        setListTranslation(`-${(currentSlide + 1) * 100}`)
+        applyListTranslation(`-${(currentSlide + 1) * 100}`)
         setCurrentSlide(currentSlide + 1)
       } else if (restartOnEnd) {
-        setListTranslation(0)
+        applyListTranslation(0)
         setCurrentSlide(0)
       } else if (isSwiping.active) {
-        setListTranslation(`-${currentSlide * 100}`)
+        applyListTranslation(`-${currentSlide * 100}`)
       }
     }, [
       infinity,
@@ -122,59 +126,31 @@ const Carousel = forwardRef(
       slideCount,
       isSwiping.active,
       infinityNextHandler,
-      setListTranslation
+      applyListTranslation
     ])
 
     const prevHandler = useCallback(() => {
       if (currentSlide > 0) {
-        setListTranslation(`-${(currentSlide - 1) * 100}`)
+        applyListTranslation(`-${(currentSlide - 1) * 100}`)
         setCurrentSlide(currentSlide - 1)
       } else if (restartOnEnd) {
-        setListTranslation(`-${slideCount * 100}`)
+        applyListTranslation(`-${slideCount * 100}`)
         setCurrentSlide(slideCount)
       } else if (infinity) {
         infinityPrevHandler()
       } else if (isSwiping.active) {
         console.log('PREV!')
-        setListTranslation('0')
+        applyListTranslation('0')
       }
     }, [
       currentSlide,
       restartOnEnd,
       infinity,
       isSwiping.active,
-      setListTranslation,
+      applyListTranslation,
       slideCount,
       infinityPrevHandler
     ])
-
-    const getAbsoluteWidth = el => {
-      const margin = parseInt(getComputedStyle(el)['margin-right'].replace('px', ''))
-      const elementValues = el.getBoundingClientRect()
-
-      return {
-        fullWidth: elementValues.width,
-        margin
-      }
-    }
-
-    const waitForElementWidth = async itemEl => {
-      let resizeObserver = null
-
-      await new Promise(resolve => {
-        resizeObserver = new ResizeObserver(entries => {
-          for (const entry of entries) {
-            const { width } = entry.contentRect
-
-            if (width) {
-              resizeObserver.unobserve(itemEl)
-              return resolve('rendered!')
-            }
-          }
-        })
-        resizeObserver.observe(itemEl)
-      })
-    }
 
     const checkAndInitInfinity = useCallback(
       (infinity, count, itemsEls) => {
@@ -230,15 +206,22 @@ const Carousel = forwardRef(
 
         setSlideCount(count)
         setSlideItemsEl(itemsEls)
+        dispatch({
+          type: 'SET_COUNT',
+          payload: count
+        })
+        dispatch({
+          type: 'SET_ITEMS_EL',
+          payload: itemsEls
+        })
       }
-    }, [visibleItems, checkAndInitInfinity, infinity])
+    }, [visibleItems, checkAndInitInfinity, infinity, dispatch])
 
     useEffect(() => {
       if (childrenItems) {
         initCarouselValues()
       }
-      // console.log('CHANGED!')
-    }, [childrenItems, initCarouselValues])
+    }, [childrenItems, initCarouselValues, dispatch])
 
     const initCarouselChildrens = () => {
       if (children && carouselRef?.current) {
@@ -264,10 +247,15 @@ const Carousel = forwardRef(
         })
 
         setChildrenItems(processedItems)
+        dispatch({
+          type: 'SET_SLIDE_CHILDREN_ITEMS',
+          payload: processedItems
+        })
       }
     }
 
     useEffect(initCarouselChildrens, [
+      dispatch,
       children,
       wrapperRef,
       setChildrenItems,
@@ -548,4 +536,16 @@ Carousel.propTypes = {
   hideActions: PropTypes.bool
 }
 
-export default Carousel
+const CarouselWrapper = ({ children }) => {
+  return (
+    <CarouselContextProvider>
+      <Carousel>{children}</Carousel>
+    </CarouselContextProvider>
+  )
+}
+
+CarouselWrapper.propTypes = {
+  children: PropTypes.node
+}
+
+export default CarouselWrapper
