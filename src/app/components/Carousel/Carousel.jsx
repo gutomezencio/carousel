@@ -10,7 +10,10 @@ import React, {
 import PropTypes from 'prop-types'
 
 import CarouselContextProvider, { CarouselContext } from './CarouselContext'
+
 import CarouselActions from './CarouselActions'
+import CarouselNavigation from './CarouselNavigation'
+
 import { getAbsoluteWidth, waitForElementWidth } from 'app/utils'
 
 import './Carousel.scoped.scss'
@@ -45,6 +48,25 @@ const CarouselContent = forwardRef(
         listRef.current.style.transform = `translate3d(${translationValue}%, 0, 0)`
       },
       [listRef]
+    )
+
+    const toggleSwipingClass = toggle => {
+      setSwipingClass(toggle)
+    }
+
+    const goToSlide = useCallback(
+      slideNumber => {
+        const insideNumber = slideNumber - 1
+
+        if (!infinity && insideNumber >= 0 && insideNumber <= state.slideCount) {
+          applyListTranslation(`-${insideNumber * 100}`)
+          dispatch({
+            type: 'SET_CURRENT_SLIDE',
+            payload: insideNumber
+          })
+        }
+      },
+      [infinity, state.slideCount, applyListTranslation, dispatch]
     )
 
     const checkAndInitInfinity = useCallback(
@@ -158,31 +180,6 @@ const CarouselContent = forwardRef(
       })
     }, [state.currentSlide, state.slideCount, dispatch])
 
-    const toggleSwipingClass = toggle => {
-      setSwipingClass(toggle)
-    }
-
-    const goToSlide = useCallback(
-      slideNumber => {
-        const insideNumber = slideNumber - 1
-
-        if (!infinity && insideNumber >= 0 && insideNumber <= state.slideCount) {
-          applyListTranslation(`-${insideNumber * 100}`)
-          dispatch({
-            type: 'SET_CURRENT_SLIDE',
-            payload: insideNumber
-          })
-        }
-      },
-      [infinity, state.slideCount, applyListTranslation, dispatch]
-    )
-
-    useImperativeHandle(ref, () => ({
-      goToSlide,
-      previous: () => actionRef.current.prevHandler(),
-      next: () => actionRef.current.nextHandler()
-    }))
-
     useEffect(() => {
       dispatch({
         type: 'SET_CONFIG',
@@ -209,6 +206,12 @@ const CarouselContent = forwardRef(
       dispatch
     ])
 
+    useImperativeHandle(ref, () => ({
+      goToSlide,
+      previous: () => actionRef.current.prevHandler(),
+      next: () => actionRef.current.nextHandler()
+    }))
+
     return (
       <div className="carousel" ref={carouselRef} {...rest}>
         <div className="carousel__wrapper" ref={wrapperRef}>
@@ -225,22 +228,7 @@ const CarouselContent = forwardRef(
         )}
 
         {showNavigation && state.slideCount && !infinity && (
-          <div className="carousel__navigation">
-            {Array.from(Array(state.slideCount + 1).keys()).map((_, index) => {
-              return (
-                <button
-                  type="button"
-                  key={`navigation-${index}`}
-                  onClick={() => goToSlide(index + 1)}
-                  className={`carousel__navigation__number ${
-                    state.currentSlide === index ? 'carousel__navigation__number--current' : ''
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              )
-            })}
-          </div>
+          <CarouselNavigation goToSlide={goToSlide} />
         )}
 
         {wrapperRef.current && listRef.current && (
