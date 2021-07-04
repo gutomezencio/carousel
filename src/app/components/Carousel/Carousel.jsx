@@ -1,4 +1,12 @@
-import React, { useEffect, useRef, useCallback, useContext, useState, forwardRef } from 'react'
+import React, {
+  useEffect,
+  useRef,
+  useCallback,
+  useContext,
+  useState,
+  forwardRef,
+  useImperativeHandle
+} from 'react'
 import PropTypes from 'prop-types'
 
 import CarouselContextProvider, { CarouselContext } from './CarouselContext'
@@ -28,6 +36,7 @@ const CarouselContent = forwardRef(
     const carouselRef = useRef()
     const wrapperRef = useRef()
     const listRef = useRef()
+    const actionRef = useRef()
 
     const [swipingClass, setSwipingClass] = useState(false)
 
@@ -153,6 +162,27 @@ const CarouselContent = forwardRef(
       setSwipingClass(toggle)
     }
 
+    const goToSlide = useCallback(
+      slideNumber => {
+        const insideNumber = slideNumber - 1
+
+        if (!infinity && insideNumber >= 0 && insideNumber <= state.slideCount) {
+          applyListTranslation(`-${insideNumber * 100}`)
+          dispatch({
+            type: 'SET_CURRENT_SLIDE',
+            payload: insideNumber
+          })
+        }
+      },
+      [infinity, state.slideCount, applyListTranslation, dispatch]
+    )
+
+    useImperativeHandle(ref, () => ({
+      goToSlide,
+      previous: () => actionRef.current.prevHandler(),
+      next: () => actionRef.current.nextHandler()
+    }))
+
     return (
       <div className="carousel" ref={carouselRef} {...rest}>
         <div className="carousel__wrapper" ref={wrapperRef}>
@@ -187,7 +217,7 @@ const CarouselContent = forwardRef(
           </div>
         )}
 
-        {!hideActions && wrapperRef.current && listRef.current && (
+        {wrapperRef.current && listRef.current && (
           <CarouselActions
             infinity={infinity}
             restartOnEnd={restartOnEnd}
@@ -196,6 +226,8 @@ const CarouselContent = forwardRef(
             wrapperRefCurrent={wrapperRef.current}
             componentRef={ref}
             toggleSwipingClass={toggleSwipingClass}
+            hideActions={hideActions}
+            ref={actionRef}
           />
         )}
       </div>
