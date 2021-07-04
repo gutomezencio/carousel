@@ -58,6 +58,16 @@ const Carousel = forwardRef(
       [listRef]
     )
 
+    console.log('CONTEXT STATE', state)
+    console.log('COMPONENT STATE', {
+      currentSlide,
+      slideCount,
+      slideItemsEl,
+      childrenItems,
+      currentSlideFormatted,
+      isSwiping
+    })
+
     const infinityNextHandler = useCallback(() => {
       const itemWidth = getAbsoluteWidth(slideItemsEl[0])
       const wrapperWidth = getAbsoluteWidth(wrapperRef.current)
@@ -83,7 +93,11 @@ const Carousel = forwardRef(
 
       applyListTranslation(`${currentSlide < 0 ? '' : '-'}${translationMultiplier * 100}`)
       setCurrentSlide(currentSlide + 1)
-    }, [slideItemsEl, currentSlide, applyListTranslation])
+      dispatch({
+        type: 'SET_CURRENT_SLIDE',
+        payload: currentSlide + 1
+      })
+    }, [slideItemsEl, currentSlide, applyListTranslation, dispatch])
 
     const infinityPrevHandler = useCallback(() => {
       const itemWidth = getAbsoluteWidth(slideItemsEl[0])
@@ -105,7 +119,11 @@ const Carousel = forwardRef(
 
       applyListTranslation(leftMultiplier * 100)
       setCurrentSlide(currentSlide - 1)
-    }, [slideItemsEl, currentSlide, applyListTranslation])
+      dispatch({
+        type: 'SET_CURRENT_SLIDE',
+        payload: currentSlide - 1
+      })
+    }, [slideItemsEl, currentSlide, applyListTranslation, dispatch])
 
     const nextHandler = useCallback(() => {
       if (infinity && !restartOnEnd) {
@@ -113,9 +131,17 @@ const Carousel = forwardRef(
       } else if (currentSlide < slideCount) {
         applyListTranslation(`-${(currentSlide + 1) * 100}`)
         setCurrentSlide(currentSlide + 1)
+        dispatch({
+          type: 'SET_CURRENT_SLIDE',
+          payload: currentSlide + 1
+        })
       } else if (restartOnEnd) {
         applyListTranslation(0)
         setCurrentSlide(0)
+        dispatch({
+          type: 'SET_CURRENT_SLIDE',
+          payload: 0
+        })
       } else if (isSwiping.active) {
         applyListTranslation(`-${currentSlide * 100}`)
       }
@@ -126,16 +152,25 @@ const Carousel = forwardRef(
       slideCount,
       isSwiping.active,
       infinityNextHandler,
-      applyListTranslation
+      applyListTranslation,
+      dispatch
     ])
 
     const prevHandler = useCallback(() => {
       if (currentSlide > 0) {
         applyListTranslation(`-${(currentSlide - 1) * 100}`)
         setCurrentSlide(currentSlide - 1)
+        dispatch({
+          type: 'SET_CURRENT_SLIDE',
+          payload: currentSlide - 1
+        })
       } else if (restartOnEnd) {
         applyListTranslation(`-${slideCount * 100}`)
         setCurrentSlide(slideCount)
+        dispatch({
+          type: 'SET_CURRENT_SLIDE',
+          payload: slideCount
+        })
       } else if (infinity) {
         infinityPrevHandler()
       } else if (isSwiping.active) {
@@ -149,7 +184,8 @@ const Carousel = forwardRef(
       isSwiping.active,
       applyListTranslation,
       slideCount,
-      infinityPrevHandler
+      infinityPrevHandler,
+      dispatch
     ])
 
     const checkAndInitInfinity = useCallback(
@@ -280,17 +316,15 @@ const Carousel = forwardRef(
     )
 
     useEffect(() => {
-      const currentSlide = currentSlide >= 0 ? currentSlide + 1 : currentSlide
-      const totalSlides = slideCount ? slideCount + 1 : 0
+      const formattedCurrentSlide = currentSlide >= 0 ? currentSlide + 1 : currentSlide
+      // const totalSlides = slideCount ? slideCount + 1 : 0
 
-      setCurrentSlideFormatted(currentSlide)
-
-      slideCount &&
-        onChange({
-          currentSlide,
-          totalSlides
-        })
-    }, [currentSlide, slideCount, onChange])
+      setCurrentSlideFormatted(formattedCurrentSlide)
+      dispatch({
+        type: 'SET_CURRENT_SLIDE_FORMATTED',
+        payload: formattedCurrentSlide
+      })
+    }, [currentSlide, slideCount, dispatch])
 
     const goToSlide = useCallback(
       slideNumber => {
@@ -299,9 +333,13 @@ const Carousel = forwardRef(
         if (!infinity && insideNumber >= 0 && insideNumber <= slideCount) {
           listRef.current.style.transform = `translate3d(-${insideNumber * 100}%, 0, 0)`
           setCurrentSlide(insideNumber)
+          dispatch({
+            type: 'SET_CURRENT_SLIDE',
+            payload: insideNumber
+          })
         }
       },
-      [infinity, slideCount]
+      [infinity, slideCount, dispatch]
     )
 
     const swipeStartHandler = event => {
@@ -317,6 +355,16 @@ const Carousel = forwardRef(
         firstX,
         firstY: event.changedTouches?.[0].clientY,
         currentTranslate
+      })
+
+      dispatch({
+        type: 'SET_IS_SWIPING',
+        payload: {
+          active: true,
+          firstX,
+          firstY: event.changedTouches?.[0].clientY,
+          currentTranslate
+        }
       })
 
       listRef.current.style.transform = `translate3d(${currentTranslate}px, 0, 0)`
@@ -344,6 +392,13 @@ const Carousel = forwardRef(
             ...lastState,
             swipeClass: true
           }))
+
+          dispatch({
+            type: 'SET_IS_SWIPING',
+            payload: {
+              swipeClass: true
+            }
+          })
         }
 
         const eventX = event.screenX || event.changedTouches[0].clientX
@@ -385,6 +440,17 @@ const Carousel = forwardRef(
           firstY: null,
           currentTranslate: null,
           swipeClass: false
+        })
+
+        dispatch({
+          type: 'IS_SWIPING',
+          payload: {
+            active: false,
+            firstX: null,
+            firstY: null,
+            currentTranslate: null,
+            swipeClass: false
+          }
         })
       }
     }
@@ -536,13 +602,17 @@ Carousel.propTypes = {
   hideActions: PropTypes.bool
 }
 
-const CarouselWrapper = ({ children }) => {
+const CarouselWrapper = forwardRef(({ children, ...rest }, ref) => {
   return (
     <CarouselContextProvider>
-      <Carousel>{children}</Carousel>
+      <Carousel {...rest} ref={ref}>
+        {children}
+      </Carousel>
     </CarouselContextProvider>
   )
-}
+})
+
+CarouselWrapper.displayName = 'CarouselWrapper'
 
 CarouselWrapper.propTypes = {
   children: PropTypes.node

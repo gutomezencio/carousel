@@ -57,7 +57,7 @@ const CarouselArea = () => {
         </Carousel>
       </div>
 
-      {/* <div className="carousel-area__item carousel-area__item--hide-mobile">
+      <div className="carousel-area__item carousel-area__item--hide-mobile">
         <h2>Custom Width</h2>
         <Carousel visibleItems={1} height={'auto'} width={'500px'}>
           {GenerateItems(9)}
@@ -194,7 +194,7 @@ const CarouselArea = () => {
         >
           {'>'}
         </button>
-      </div> */}
+      </div>
     </div>
   )
 }
