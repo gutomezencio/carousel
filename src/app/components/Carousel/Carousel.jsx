@@ -38,19 +38,6 @@ const Carousel = forwardRef(
     const listRef = useRef()
     const componentRef = useRef()
 
-    const [currentSlide, setCurrentSlide] = useState(0)
-    const [slideCount, setSlideCount] = useState(null)
-    const [slideItemsEl, setSlideItemsEl] = useState(null)
-    const [childrenItems, setChildrenItems] = useState(null)
-    const [currentSlideFormatted, setCurrentSlideFormatted] = useState(null)
-    const [isSwiping, setIsSwiping] = useState({
-      active: false,
-      firstX: null,
-      firstY: null,
-      currentTranslate: null,
-      swipeClass: false
-    })
-
     const applyListTranslation = useCallback(
       translationValue => {
         listRef.current.style.transform = `translate3d(${translationValue}%, 0, 0)`
@@ -58,18 +45,8 @@ const Carousel = forwardRef(
       [listRef]
     )
 
-    console.log('CONTEXT STATE', state)
-    console.log('COMPONENT STATE', {
-      currentSlide,
-      slideCount,
-      slideItemsEl,
-      childrenItems,
-      currentSlideFormatted,
-      isSwiping
-    })
-
     const infinityNextHandler = useCallback(() => {
-      const itemWidth = getAbsoluteWidth(slideItemsEl[0])
+      const itemWidth = getAbsoluteWidth(state.slideItemsEl[0])
       const wrapperWidth = getAbsoluteWidth(wrapperRef.current)
 
       const currentItemsEls = listRef.current.querySelectorAll('.carousel__item')
@@ -78,10 +55,11 @@ const Carousel = forwardRef(
         itemWidth.margin -
         listRef.current.style.left.replace(/px|-/g, '')
       const currentCount = parseInt(listWidth / wrapperWidth.fullWidth)
-      const translationMultiplier = currentSlide < 0 ? Math.abs(currentSlide) - 1 : currentSlide + 1
+      const translationMultiplier =
+        state.currentSlide < 0 ? Math.abs(state.currentSlide) - 1 : state.currentSlide + 1
 
-      if (currentCount === currentSlide + 1) {
-        Array.from(slideItemsEl).forEach(elNode => {
+      if (currentCount === state.currentSlide + 1) {
+        Array.from(state.slideItemsEl).forEach(elNode => {
           const currentEls = listRef.current.querySelectorAll('.carousel__item')
 
           listRef.current.insertBefore(
@@ -91,24 +69,23 @@ const Carousel = forwardRef(
         })
       }
 
-      applyListTranslation(`${currentSlide < 0 ? '' : '-'}${translationMultiplier * 100}`)
-      setCurrentSlide(currentSlide + 1)
+      applyListTranslation(`${state.currentSlide < 0 ? '' : '-'}${translationMultiplier * 100}`)
       dispatch({
         type: 'SET_CURRENT_SLIDE',
-        payload: currentSlide + 1
+        payload: state.currentSlide + 1
       })
-    }, [slideItemsEl, currentSlide, applyListTranslation, dispatch])
+    }, [state.slideItemsEl, state.currentSlide, applyListTranslation, dispatch])
 
     const infinityPrevHandler = useCallback(() => {
-      const itemWidth = getAbsoluteWidth(slideItemsEl[0])
-      const cloneQuant = slideItemsEl.length
-      const leftMultiplier = currentSlide ? Math.abs(currentSlide) + 1 : 1
+      const itemWidth = getAbsoluteWidth(state.slideItemsEl[0])
+      const cloneQuant = state.slideItemsEl.length
+      const leftMultiplier = state.currentSlide ? Math.abs(state.currentSlide) + 1 : 1
 
       listRef.current.style.left = `-${
         (itemWidth.fullWidth + itemWidth.margin) * leftMultiplier * cloneQuant
       }px`
 
-      Array.from(slideItemsEl)
+      Array.from(state.slideItemsEl)
         .reverse()
         .forEach(elNode => {
           listRef.current.insertBefore(
@@ -118,72 +95,66 @@ const Carousel = forwardRef(
         })
 
       applyListTranslation(leftMultiplier * 100)
-      setCurrentSlide(currentSlide - 1)
       dispatch({
         type: 'SET_CURRENT_SLIDE',
-        payload: currentSlide - 1
+        payload: state.currentSlide - 1
       })
-    }, [slideItemsEl, currentSlide, applyListTranslation, dispatch])
+    }, [state.slideItemsEl, state.currentSlide, applyListTranslation, dispatch])
 
     const nextHandler = useCallback(() => {
       if (infinity && !restartOnEnd) {
         infinityNextHandler()
-      } else if (currentSlide < slideCount) {
-        applyListTranslation(`-${(currentSlide + 1) * 100}`)
-        setCurrentSlide(currentSlide + 1)
+      } else if (state.currentSlide < state.slideCount) {
+        applyListTranslation(`-${(state.currentSlide + 1) * 100}`)
         dispatch({
           type: 'SET_CURRENT_SLIDE',
-          payload: currentSlide + 1
+          payload: state.currentSlide + 1
         })
       } else if (restartOnEnd) {
         applyListTranslation(0)
-        setCurrentSlide(0)
         dispatch({
           type: 'SET_CURRENT_SLIDE',
           payload: 0
         })
-      } else if (isSwiping.active) {
-        applyListTranslation(`-${currentSlide * 100}`)
+      } else if (state.isSwiping.active) {
+        applyListTranslation(`-${state.currentSlide * 100}`)
       }
     }, [
       infinity,
       restartOnEnd,
-      currentSlide,
-      slideCount,
-      isSwiping.active,
+      state.currentSlide,
+      state.slideCount,
+      state.isSwiping.active,
       infinityNextHandler,
       applyListTranslation,
       dispatch
     ])
 
     const prevHandler = useCallback(() => {
-      if (currentSlide > 0) {
-        applyListTranslation(`-${(currentSlide - 1) * 100}`)
-        setCurrentSlide(currentSlide - 1)
+      if (state.currentSlide > 0) {
+        applyListTranslation(`-${(state.currentSlide - 1) * 100}`)
         dispatch({
           type: 'SET_CURRENT_SLIDE',
-          payload: currentSlide - 1
+          payload: state.currentSlide - 1
         })
       } else if (restartOnEnd) {
-        applyListTranslation(`-${slideCount * 100}`)
-        setCurrentSlide(slideCount)
+        applyListTranslation(`-${state.slideCount * 100}`)
         dispatch({
           type: 'SET_CURRENT_SLIDE',
-          payload: slideCount
+          payload: state.slideCount
         })
       } else if (infinity) {
         infinityPrevHandler()
-      } else if (isSwiping.active) {
-        console.log('PREV!')
+      } else if (state.isSwiping.active) {
         applyListTranslation('0')
       }
     }, [
-      currentSlide,
-      restartOnEnd,
       infinity,
-      isSwiping.active,
+      restartOnEnd,
+      state.currentSlide,
+      state.isSwiping.active,
+      state.slideCount,
       applyListTranslation,
-      slideCount,
       infinityPrevHandler,
       dispatch
     ])
@@ -240,8 +211,6 @@ const Carousel = forwardRef(
 
         itemsEls = checkAndInitInfinity(infinity, count, itemsEls)
 
-        setSlideCount(count)
-        setSlideItemsEl(itemsEls)
         dispatch({
           type: 'SET_COUNT',
           payload: count
@@ -254,10 +223,10 @@ const Carousel = forwardRef(
     }, [visibleItems, checkAndInitInfinity, infinity, dispatch])
 
     useEffect(() => {
-      if (childrenItems) {
+      if (state.childrenItems) {
         initCarouselValues()
       }
-    }, [childrenItems, initCarouselValues, dispatch])
+    }, [state.childrenItems, initCarouselValues, dispatch])
 
     const initCarouselChildrens = () => {
       if (children && carouselRef?.current) {
@@ -282,7 +251,6 @@ const Carousel = forwardRef(
           })
         })
 
-        setChildrenItems(processedItems)
         dispatch({
           type: 'SET_SLIDE_CHILDREN_ITEMS',
           payload: processedItems
@@ -290,56 +258,47 @@ const Carousel = forwardRef(
       }
     }
 
-    useEffect(initCarouselChildrens, [
-      dispatch,
-      children,
-      wrapperRef,
-      setChildrenItems,
-      width,
-      visibleItems,
-      height
-    ])
+    useEffect(initCarouselChildrens, [dispatch, children, wrapperRef, width, visibleItems, height])
 
     const buttonInactive = useCallback(
       type => {
         if (!infinity && !restartOnEnd) {
           if (type === 'next') {
-            return currentSlide === slideCount
+            return state.currentSlide === state.slideCount
           } else if (type === 'prev') {
-            return currentSlide === 0
+            return state.currentSlide === 0
           }
         }
 
         return false
       },
-      [currentSlide, slideCount, infinity, restartOnEnd]
+      [state.currentSlide, state.slideCount, infinity, restartOnEnd]
     )
 
     useEffect(() => {
-      const formattedCurrentSlide = currentSlide >= 0 ? currentSlide + 1 : currentSlide
+      const formattedCurrentSlide =
+        state.currentSlide >= 0 ? state.currentSlide + 1 : state.currentSlide
       // const totalSlides = slideCount ? slideCount + 1 : 0
 
-      setCurrentSlideFormatted(formattedCurrentSlide)
       dispatch({
         type: 'SET_CURRENT_SLIDE_FORMATTED',
         payload: formattedCurrentSlide
       })
-    }, [currentSlide, slideCount, dispatch])
+    }, [state.currentSlide, state.slideCount, dispatch])
 
     const goToSlide = useCallback(
       slideNumber => {
         const insideNumber = slideNumber - 1
 
-        if (!infinity && insideNumber >= 0 && insideNumber <= slideCount) {
+        if (!infinity && insideNumber >= 0 && insideNumber <= state.slideCount) {
           listRef.current.style.transform = `translate3d(-${insideNumber * 100}%, 0, 0)`
-          setCurrentSlide(insideNumber)
           dispatch({
             type: 'SET_CURRENT_SLIDE',
             payload: insideNumber
           })
         }
       },
-      [infinity, slideCount, dispatch]
+      [infinity, state.slideCount, dispatch]
     )
 
     const swipeStartHandler = event => {
@@ -349,13 +308,6 @@ const Carousel = forwardRef(
       const matrix = new DOMMatrixReadOnly(style.transform)
       const firstX = event.screenX || event.changedTouches[0].clientX
       const currentTranslate = matrix.m41
-
-      setIsSwiping({
-        active: true,
-        firstX,
-        firstY: event.changedTouches?.[0].clientY,
-        currentTranslate
-      })
 
       dispatch({
         type: 'SET_IS_SWIPING',
@@ -373,26 +325,21 @@ const Carousel = forwardRef(
     const touchEndHandler = changedTouches => {
       console.log('TOUCH END')
       const { clientX: x, clientY: y } = changedTouches
-      const distanceX = Math.abs(x - isSwiping.firstX)
-      const distanceY = Math.abs(y - isSwiping.firstY)
+      const distanceX = Math.abs(x - state.isSwiping.firstX)
+      const distanceY = Math.abs(y - state.isSwiping.firstY)
 
       if (distanceX > 15 && distanceY < 100) {
-        if (x < isSwiping.firstX) {
+        if (x < state.isSwiping.firstX) {
           componentRef.current.nextHandler()
-        } else if (x > isSwiping.firstX) {
+        } else if (x > state.isSwiping.firstX) {
           componentRef.current.prevHandler()
         }
       }
     }
 
     const swipeMoveHandler = event => {
-      if (isSwiping.active) {
-        if (!isSwiping.swipeClass) {
-          setIsSwiping(lastState => ({
-            ...lastState,
-            swipeClass: true
-          }))
-
+      if (state.isSwiping.active) {
+        if (!state.isSwiping.swipeClass) {
           dispatch({
             type: 'SET_IS_SWIPING',
             payload: {
@@ -402,12 +349,15 @@ const Carousel = forwardRef(
         }
 
         const eventX = event.screenX || event.changedTouches[0].clientX
-        const currentX = eventX - isSwiping.firstX
+        const currentX = eventX - state.isSwiping.firstX
 
-        console.log('Y', Math.abs(event.changedTouches[0].clientY - isSwiping.firstY))
-        console.log('X', Math.abs(event.changedTouches[0].clientX - isSwiping.firstX))
+        console.log('Y', Math.abs(event.changedTouches[0].clientY - state.isSwiping.firstY))
+        console.log('X', Math.abs(event.changedTouches[0].clientX - state.isSwiping.firstX))
 
-        if (!event.screenX && Math.abs(event.changedTouches[0].clientY - isSwiping.firstY) > 150) {
+        if (
+          !event.screenX &&
+          Math.abs(event.changedTouches[0].clientY - state.isSwiping.firstY) > 150
+        ) {
           console.log('NO SW')
           return false
         }
@@ -415,17 +365,17 @@ const Carousel = forwardRef(
         console.log('TRANS?')
 
         listRef.current.style.transform = `translate3d(${
-          isSwiping.currentTranslate + currentX
+          state.isSwiping.currentTranslate + currentX
         }px, 0, 0)`
       }
     }
 
     const swipeEndHandler = event => {
-      if (isSwiping.active) {
+      if (state.isSwiping.active) {
         // event.preventDefault()
 
         if (event.screenX) {
-          if (event.screenX - isSwiping.firstX > 0) {
+          if (event.screenX - state.isSwiping.firstX > 0) {
             componentRef.current.prevHandler()
           } else {
             componentRef.current.nextHandler()
@@ -433,14 +383,6 @@ const Carousel = forwardRef(
         } else {
           touchEndHandler(event.changedTouches[0])
         }
-
-        setIsSwiping({
-          active: false,
-          firstX: null,
-          firstY: null,
-          currentTranslate: null,
-          swipeClass: false
-        })
 
         dispatch({
           type: 'IS_SWIPING',
@@ -529,27 +471,29 @@ const Carousel = forwardRef(
       <div className="carousel" ref={carouselRef} {...rest}>
         <div className="carousel__wrapper" ref={wrapperRef}>
           <div
-            className={`carousel__list ${isSwiping.swipeClass ? 'carousel__list--swiping' : ''}`}
+            className={`carousel__list ${
+              state.isSwiping.swipeClass ? 'carousel__list--swiping' : ''
+            }`}
             ref={listRef}
           >
-            {childrenItems}
+            {state.childrenItems}
           </div>
         </div>
 
-        {showCurrentNumber && slideCount && (
-          <div className="carousel__number">{currentSlideFormatted}</div>
+        {showCurrentNumber && state.slideCount && (
+          <div className="carousel__number">{state.currentSlideFormatted}</div>
         )}
 
-        {showNavigation && slideCount && !infinity && (
+        {showNavigation && state.slideCount && !infinity && (
           <div className="carousel__navigation">
-            {Array.from(Array(slideCount + 1).keys()).map((_, index) => {
+            {Array.from(Array(state.slideCount + 1).keys()).map((_, index) => {
               return (
                 <button
                   type="button"
                   key={`navigation-${index}`}
                   onClick={() => goToSlide(index + 1)}
                   className={`carousel__navigation__number ${
-                    currentSlide === index ? 'carousel__navigation__number--current' : ''
+                    state.currentSlide === index ? 'carousel__navigation__number--current' : ''
                   }`}
                 >
                   {index + 1}
