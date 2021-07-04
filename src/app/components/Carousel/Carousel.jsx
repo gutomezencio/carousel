@@ -98,37 +98,34 @@ const CarouselContent = forwardRef(
     const initCarouselValues = useCallback(async () => {
       let itemsEls = listRef.current.querySelectorAll('.carousel__item')
       const itemsLength = itemsEls.length
+      const wrapperWidth = getAbsoluteWidth(wrapperRef.current)
+      let count = 0
+      let elWidth = getAbsoluteWidth(itemsEls[0])
 
-      if (itemsLength) {
-        let count = 0
-        let elWidth = getAbsoluteWidth(itemsEls[0])
-        const wrapperWidth = getAbsoluteWidth(wrapperRef.current)
+      if (elWidth.fullWidth === 0) {
+        await waitForElementWidth(itemsEls[0])
 
-        if (!visibleItems) {
-          if (elWidth.fullWidth === 0) {
-            await waitForElementWidth(itemsEls[0])
-
-            elWidth = getAbsoluteWidth(itemsEls[0])
-          }
-
-          let listWidth = elWidth.fullWidth * itemsLength - elWidth.margin
-          count = parseInt(listWidth / wrapperWidth.fullWidth)
-        } else {
-          count = parseInt(itemsLength / visibleItems)
-          count = itemsLength % visibleItems === 0 ? count - 1 : count
-        }
-
-        itemsEls = checkAndInitInfinity(infinity, count, itemsEls)
-
-        dispatch({
-          type: 'SET_COUNT',
-          payload: count
-        })
-        dispatch({
-          type: 'SET_ITEMS_EL',
-          payload: itemsEls
-        })
+        elWidth = getAbsoluteWidth(itemsEls[0])
       }
+
+      let listWidth = elWidth.fullWidth * itemsLength - elWidth.margin
+      count = parseInt(listWidth / wrapperWidth.fullWidth)
+
+      if (visibleItems) {
+        count = parseInt(itemsLength / visibleItems)
+        count = itemsLength % visibleItems === 0 ? count - 1 : count
+      }
+
+      itemsEls = checkAndInitInfinity(infinity, count, itemsEls)
+
+      dispatch({
+        type: 'SET_COUNT',
+        payload: count
+      })
+      dispatch({
+        type: 'SET_ITEMS_EL',
+        payload: itemsEls
+      })
     }, [visibleItems, checkAndInitInfinity, infinity, dispatch])
 
     useEffect(() => {
