@@ -183,6 +183,32 @@ const CarouselContent = forwardRef(
       next: () => actionRef.current.nextHandler()
     }))
 
+    useEffect(() => {
+      dispatch({
+        type: 'SET_CONFIG',
+        payload: {
+          infinity,
+          restartOnEnd,
+          showCurrentNumber,
+          showNavigation,
+          hideActions,
+          visibleItems,
+          height,
+          width
+        }
+      })
+    }, [
+      infinity,
+      restartOnEnd,
+      showCurrentNumber,
+      showNavigation,
+      hideActions,
+      visibleItems,
+      height,
+      width,
+      dispatch
+    ])
+
     return (
       <div className="carousel" ref={carouselRef} {...rest}>
         <div className="carousel__wrapper" ref={wrapperRef}>

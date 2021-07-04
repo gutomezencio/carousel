@@ -35,6 +35,15 @@ const reducer = (state, action) => {
         currentSlideFormatted: action.payload
       }
     }
+    case 'SET_CONFIG': {
+      return {
+        ...state,
+        config: {
+          ...state.config,
+          ...action.payload
+        }
+      }
+    }
   }
 
   return {

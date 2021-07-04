@@ -3,5 +3,15 @@ export default {
   slideCount: null,
   slideItemsEl: null,
   childrenItems: null,
-  currentSlideFormatted: null
+  currentSlideFormatted: null,
+  config: {
+    infinity: false,
+    restartOnEnd: false,
+    showCurrentNumber: false,
+    showNavigation: false,
+    hideActions: false,
+    visibleItems: null,
+    height: null,
+    width: null
+  }
 }
