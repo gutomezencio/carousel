@@ -17,7 +17,8 @@ import CarouselNavigation from './CarouselNavigation'
 import { getAbsoluteWidth, waitForElementWidth } from 'app/utils'
 
 import './Carousel.scoped.scss'
-import useCarouselTransition from './CarouselHooks/useCarouselTransition'
+
+import useGoToSlide from './CarouselHooks/useGoToSlide'
 
 const CarouselContent = forwardRef(
   (
@@ -44,26 +45,11 @@ const CarouselContent = forwardRef(
     const onChangeCallback = useRef()
     const [swipingClass, setSwipingClass] = useState(false)
 
-    const setCarouselTransition = useCarouselTransition(listRef.current)
+    const goToSlide = useGoToSlide(listRef.current)
 
     const toggleSwipingClass = toggle => {
       setSwipingClass(toggle)
     }
-
-    const goToSlide = useCallback(
-      slideNumber => {
-        const insideNumber = slideNumber - 1
-
-        if (!infinity && insideNumber >= 0 && insideNumber <= state.slideCount) {
-          setCarouselTransition(`-${insideNumber * 100}`)
-          dispatch({
-            type: 'SET_CURRENT_SLIDE',
-            payload: insideNumber
-          })
-        }
-      },
-      [infinity, state.slideCount, setCarouselTransition, dispatch]
-    )
 
     const checkAndInitInfinity = useCallback(
       (infinity, count, itemsEls) => {
