@@ -3,9 +3,12 @@ import React, { useCallback, useContext, useRef } from 'react'
 import { CarouselContext } from '../CarouselContext'
 import { getAbsoluteWidth } from 'app/utils'
 
-const usePrevHandler = (listRefCurrent, applyListTranslation) => {
+import useCarouselTransition from './useCarouselTransition'
+
+const usePrevHandler = listRefCurrent => {
   const { dispatch, state } = useContext(CarouselContext)
   const listRef = useRef(listRefCurrent)
+  const setCarouselTransition = useCarouselTransition(listRefCurrent)
 
   const infinityPrevHandler = useCallback(() => {
     const itemWidth = getAbsoluteWidth(state.slideItemsEl[0])
@@ -25,23 +28,23 @@ const usePrevHandler = (listRefCurrent, applyListTranslation) => {
         )
       })
 
-    applyListTranslation(leftMultiplier * 100)
+    setCarouselTransition(leftMultiplier * 100)
     dispatch({
       type: 'SET_CURRENT_SLIDE',
       payload: state.currentSlide - 1
     })
-  }, [state.slideItemsEl, state.currentSlide, applyListTranslation, dispatch])
+  }, [state.slideItemsEl, state.currentSlide, setCarouselTransition, dispatch])
 
   const prevHandler = useCallback(
     swiping => {
       if (state.currentSlide > 0) {
-        applyListTranslation(`-${(state.currentSlide - 1) * 100}`)
+        setCarouselTransition(`-${(state.currentSlide - 1) * 100}`)
         dispatch({
           type: 'SET_CURRENT_SLIDE',
           payload: state.currentSlide - 1
         })
       } else if (state.config.restartOnEnd) {
-        applyListTranslation(`-${state.slideCount * 100}`)
+        setCarouselTransition(`-${state.slideCount * 100}`)
         dispatch({
           type: 'SET_CURRENT_SLIDE',
           payload: state.slideCount
@@ -49,7 +52,7 @@ const usePrevHandler = (listRefCurrent, applyListTranslation) => {
       } else if (state.config.infinity) {
         infinityPrevHandler()
       } else if (swiping) {
-        applyListTranslation('0')
+        setCarouselTransition('0')
       }
     },
     [
@@ -57,7 +60,7 @@ const usePrevHandler = (listRefCurrent, applyListTranslation) => {
       state.config.restartOnEnd,
       state.currentSlide,
       state.slideCount,
-      applyListTranslation,
+      setCarouselTransition,
       infinityPrevHandler,
       dispatch
     ]

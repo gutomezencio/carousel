@@ -2,10 +2,13 @@ import React, { useCallback, useContext, useRef } from 'react'
 
 import { CarouselContext } from '../CarouselContext'
 import { getAbsoluteWidth } from 'app/utils'
-const useNextHandler = (listRefCurrent, wrapperRefCurrent, applyListTranslation) => {
+
+import useCarouselTransition from './useCarouselTransition'
+const useNextHandler = (listRefCurrent, wrapperRefCurrent) => {
   const { dispatch, state } = useContext(CarouselContext)
   const listRef = useRef(listRefCurrent)
   const wrapperRef = useRef(wrapperRefCurrent)
+  const setCarouselTransition = useCarouselTransition(listRefCurrent)
 
   const infinityNextHandler = useCallback(() => {
     const itemWidth = getAbsoluteWidth(state.slideItemsEl[0])
@@ -31,31 +34,31 @@ const useNextHandler = (listRefCurrent, wrapperRefCurrent, applyListTranslation)
       })
     }
 
-    applyListTranslation(`${state.currentSlide < 0 ? '' : '-'}${translationMultiplier * 100}`)
+    setCarouselTransition(`${state.currentSlide < 0 ? '' : '-'}${translationMultiplier * 100}`)
     dispatch({
       type: 'SET_CURRENT_SLIDE',
       payload: state.currentSlide + 1
     })
-  }, [state.slideItemsEl, state.currentSlide, applyListTranslation, dispatch])
+  }, [state.slideItemsEl, state.currentSlide, setCarouselTransition, dispatch])
 
   const nextHandler = useCallback(
     swiping => {
       if (state.config.infinity && !state.config.restartOnEnd) {
         infinityNextHandler()
       } else if (state.currentSlide < state.slideCount) {
-        applyListTranslation(`-${(state.currentSlide + 1) * 100}`)
+        setCarouselTransition(`-${(state.currentSlide + 1) * 100}`)
         dispatch({
           type: 'SET_CURRENT_SLIDE',
           payload: state.currentSlide + 1
         })
       } else if (state.config.restartOnEnd) {
-        applyListTranslation(0)
+        setCarouselTransition(0)
         dispatch({
           type: 'SET_CURRENT_SLIDE',
           payload: 0
         })
       } else if (swiping) {
-        applyListTranslation(`-${state.currentSlide * 100}`)
+        setCarouselTransition(`-${state.currentSlide * 100}`)
       }
     },
     [
@@ -64,7 +67,7 @@ const useNextHandler = (listRefCurrent, wrapperRefCurrent, applyListTranslation)
       state.currentSlide,
       state.slideCount,
       infinityNextHandler,
-      applyListTranslation,
+      setCarouselTransition,
       dispatch
     ]
   )

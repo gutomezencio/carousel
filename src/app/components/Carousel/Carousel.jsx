@@ -17,6 +17,7 @@ import CarouselNavigation from './CarouselNavigation'
 import { getAbsoluteWidth, waitForElementWidth } from 'app/utils'
 
 import './Carousel.scoped.scss'
+import useCarouselTransition from './CarouselHooks/useCarouselTransition'
 
 const CarouselContent = forwardRef(
   (
@@ -41,15 +42,9 @@ const CarouselContent = forwardRef(
     const listRef = useRef()
     const actionRef = useRef()
     const onChangeCallback = useRef()
-
     const [swipingClass, setSwipingClass] = useState(false)
 
-    const applyListTranslation = useCallback(
-      translationValue => {
-        listRef.current.style.transform = `translate3d(${translationValue}%, 0, 0)`
-      },
-      [listRef]
-    )
+    const setCarouselTransition = useCarouselTransition(listRef.current)
 
     const toggleSwipingClass = toggle => {
       setSwipingClass(toggle)
@@ -60,14 +55,14 @@ const CarouselContent = forwardRef(
         const insideNumber = slideNumber - 1
 
         if (!infinity && insideNumber >= 0 && insideNumber <= state.slideCount) {
-          applyListTranslation(`-${insideNumber * 100}`)
+          setCarouselTransition(`-${insideNumber * 100}`)
           dispatch({
             type: 'SET_CURRENT_SLIDE',
             payload: insideNumber
           })
         }
       },
-      [infinity, state.slideCount, applyListTranslation, dispatch]
+      [infinity, state.slideCount, setCarouselTransition, dispatch]
     )
 
     const checkAndInitInfinity = useCallback(
@@ -240,7 +235,6 @@ const CarouselContent = forwardRef(
 
         {wrapperRef.current && listRef.current && (
           <CarouselActions
-            applyListTranslation={applyListTranslation}
             toggleSwipingClass={toggleSwipingClass}
             listRefCurrent={listRef.current}
             wrapperRefCurrent={wrapperRef.current}

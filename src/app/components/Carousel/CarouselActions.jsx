@@ -9,8 +9,8 @@ import usePrevHandler from './CarouselHooks/usePrevHandler'
 import './Carousel.scoped.scss'
 
 const CarouselActions = forwardRef(
-  ({ applyListTranslation, listRefCurrent, wrapperRefCurrent, toggleSwipingClass }, ref) => {
-    const { dispatch, state } = useContext(CarouselContext)
+  ({ listRefCurrent, wrapperRefCurrent, toggleSwipingClass }, ref) => {
+    const { state } = useContext(CarouselContext)
     const swipingControl = {
       state: {
         active: false,
@@ -27,8 +27,8 @@ const CarouselActions = forwardRef(
       }
     }
 
-    const nextHandler = useNextHandler(listRefCurrent, wrapperRefCurrent, applyListTranslation)
-    const prevHandler = usePrevHandler(listRefCurrent, applyListTranslation)
+    const nextHandler = useNextHandler(listRefCurrent, wrapperRefCurrent)
+    const prevHandler = usePrevHandler(listRefCurrent)
 
     const buttonInactive = useCallback(
       type => {
@@ -186,13 +186,8 @@ const CarouselActions = forwardRef(
 CarouselActions.displayName = 'CarouselActions'
 
 CarouselActions.propTypes = {
-  infinity: PropTypes.bool,
-  restartOnEnd: PropTypes.bool,
-  applyListTranslation: PropTypes.func,
   listRefCurrent: PropTypes.object,
-  carouselRef: PropTypes.object,
   wrapperRefCurrent: PropTypes.object,
-  componentRef: PropTypes.object,
   toggleSwipingClass: PropTypes.func
 }
 
