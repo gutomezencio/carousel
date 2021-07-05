@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useRef } from 'react'
+import { useCallback, useContext, useRef } from 'react'
 
 import * as types from '../context/types'
 import { CarouselContext } from '../context/context'
