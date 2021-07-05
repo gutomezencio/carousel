@@ -40,6 +40,7 @@ const CarouselContent = forwardRef(
     const wrapperRef = useRef()
     const listRef = useRef()
     const actionRef = useRef()
+    const onChangeCallback = useRef()
 
     const [swipingClass, setSwipingClass] = useState(false)
 
@@ -132,7 +133,7 @@ const CarouselContent = forwardRef(
       if (state.childrenItems) {
         initCarouselValues()
       }
-    }, [state.childrenItems, initCarouselValues, dispatch])
+    }, [state.childrenItems])
 
     const initCarouselChildrens = () => {
       if (children && carouselRef?.current) {
@@ -164,12 +165,21 @@ const CarouselContent = forwardRef(
       }
     }
 
-    useEffect(initCarouselChildrens, [dispatch, children, wrapperRef, width, visibleItems, height])
+    useEffect(initCarouselChildrens, [dispatch, children, width, visibleItems, height])
+
+    useEffect(() => {
+      onChangeCallback.current = onChange
+    }, [onChange])
 
     useEffect(() => {
       const formattedCurrentSlide =
         state.currentSlide >= 0 ? state.currentSlide + 1 : state.currentSlide
-      // const totalSlides = slideCount ? slideCount + 1 : 0
+
+      state.slideCount &&
+        onChangeCallback.current({
+          currentSlide: formattedCurrentSlide,
+          totalSlides: state.slideCount ? state.slideCount + 1 : 0
+        })
 
       dispatch({
         type: 'SET_CURRENT_SLIDE_FORMATTED',
