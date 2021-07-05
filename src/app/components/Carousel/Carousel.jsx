@@ -238,10 +238,10 @@ const CarouselContent = forwardRef(
 CarouselContent.displayName = 'CarouselContent'
 
 CarouselContent.propTypes = {
+  children: PropTypes.array.isRequired,
   visibleItems: PropTypes.number,
   infinity: PropTypes.bool,
   restartOnEnd: PropTypes.bool,
-  children: PropTypes.array.isRequired,
   height: PropTypes.string,
   width: PropTypes.string,
   onChange: PropTypes.func,
