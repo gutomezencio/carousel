@@ -1,6 +1,7 @@
 import React, { useContext, useCallback } from 'react'
 
-import { CarouselContext } from '../CarouselContext'
+import * as types from '../context/types'
+import { CarouselContext } from '../context/context'
 
 import useCarouselTransition from './useCarouselTransition'
 const useGoToSlide = listRefCurrent => {
@@ -14,7 +15,7 @@ const useGoToSlide = listRefCurrent => {
       if (!state.config.infinity && insideNumber >= 0 && insideNumber <= state.slideCount) {
         setCarouselTransition(`-${insideNumber * 100}`)
         dispatch({
-          type: 'SET_CURRENT_SLIDE',
+          type: types.SET_CURRENT_SLIDE,
           payload: insideNumber
         })
       }

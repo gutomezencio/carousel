@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
-import { CarouselContext } from './CarouselContext'
+import { CarouselContext } from './context/context'
 
 import './Carousel.scoped.scss'
 

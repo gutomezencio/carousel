@@ -1,10 +1,10 @@
 import React, { useImperativeHandle, useContext, useCallback, useEffect, forwardRef } from 'react'
 import PropTypes from 'prop-types'
 
-import { CarouselContext } from './CarouselContext'
+import { CarouselContext } from './context/context'
 
-import useNextHandler from './CarouselHooks/useNextHandler'
-import usePrevHandler from './CarouselHooks/usePrevHandler'
+import useNextHandler from './hooks/useNextHandler'
+import usePrevHandler from './hooks/usePrevHandler'
 
 import './Carousel.scoped.scss'
 

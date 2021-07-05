@@ -1,6 +1,8 @@
 import React, { useCallback, useContext, useRef } from 'react'
 
-import { CarouselContext } from '../CarouselContext'
+import * as types from '../context/types'
+import { CarouselContext } from '../context/context'
+
 import { getAbsoluteWidth } from 'app/utils'
 
 import useCarouselTransition from './useCarouselTransition'
@@ -30,7 +32,7 @@ const usePrevHandler = listRefCurrent => {
 
     setCarouselTransition(leftMultiplier * 100)
     dispatch({
-      type: 'SET_CURRENT_SLIDE',
+      type: types.SET_CURRENT_SLIDE,
       payload: state.currentSlide - 1
     })
   }, [state.slideItemsEl, state.currentSlide, setCarouselTransition, dispatch])
@@ -40,13 +42,13 @@ const usePrevHandler = listRefCurrent => {
       if (state.currentSlide > 0) {
         setCarouselTransition(`-${(state.currentSlide - 1) * 100}`)
         dispatch({
-          type: 'SET_CURRENT_SLIDE',
+          type: types.SET_CURRENT_SLIDE,
           payload: state.currentSlide - 1
         })
       } else if (state.config.restartOnEnd) {
         setCarouselTransition(`-${state.slideCount * 100}`)
         dispatch({
-          type: 'SET_CURRENT_SLIDE',
+          type: types.SET_CURRENT_SLIDE,
           payload: state.slideCount
         })
       } else if (state.config.infinity) {

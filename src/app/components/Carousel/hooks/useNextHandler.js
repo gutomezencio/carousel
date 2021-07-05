@@ -1,6 +1,8 @@
 import React, { useCallback, useContext, useRef } from 'react'
 
-import { CarouselContext } from '../CarouselContext'
+import * as types from '../context/types'
+import { CarouselContext } from '../context/context'
+
 import { getAbsoluteWidth } from 'app/utils'
 
 import useCarouselTransition from './useCarouselTransition'
@@ -36,7 +38,7 @@ const useNextHandler = (listRefCurrent, wrapperRefCurrent) => {
 
     setCarouselTransition(`${state.currentSlide < 0 ? '' : '-'}${translationMultiplier * 100}`)
     dispatch({
-      type: 'SET_CURRENT_SLIDE',
+      type: types.SET_CURRENT_SLIDE,
       payload: state.currentSlide + 1
     })
   }, [state.slideItemsEl, state.currentSlide, setCarouselTransition, dispatch])
@@ -48,13 +50,13 @@ const useNextHandler = (listRefCurrent, wrapperRefCurrent) => {
       } else if (state.currentSlide < state.slideCount) {
         setCarouselTransition(`-${(state.currentSlide + 1) * 100}`)
         dispatch({
-          type: 'SET_CURRENT_SLIDE',
+          type: types.SET_CURRENT_SLIDE,
           payload: state.currentSlide + 1
         })
       } else if (state.config.restartOnEnd) {
         setCarouselTransition(0)
         dispatch({
-          type: 'SET_CURRENT_SLIDE',
+          type: types.SET_CURRENT_SLIDE,
           payload: 0
         })
       } else if (swiping) {

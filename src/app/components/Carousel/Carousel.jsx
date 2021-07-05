@@ -9,7 +9,9 @@ import React, {
 } from 'react'
 import PropTypes from 'prop-types'
 
-import CarouselContextProvider, { CarouselContext } from './CarouselContext'
+import * as types from './context/types'
+import CarouselContextProvider from './context/provider'
+import { CarouselContext } from './context/context'
 
 import CarouselActions from './CarouselActions'
 import CarouselNavigation from './CarouselNavigation'
@@ -18,7 +20,7 @@ import { getAbsoluteWidth, waitForElementWidth } from 'app/utils'
 
 import './Carousel.scoped.scss'
 
-import useGoToSlide from './CarouselHooks/useGoToSlide'
+import useGoToSlide from './hooks/useGoToSlide'
 
 const CarouselContent = forwardRef(
   (
@@ -101,11 +103,11 @@ const CarouselContent = forwardRef(
       itemsEls = checkAndInitInfinity(infinity, count, itemsEls)
 
       dispatch({
-        type: 'SET_COUNT',
+        type: types.SET_COUNT,
         payload: count
       })
       dispatch({
-        type: 'SET_ITEMS_EL',
+        type: types.SET_ITEMS_EL,
         payload: itemsEls
       })
     }, [visibleItems, checkAndInitInfinity, infinity, dispatch])
@@ -140,7 +142,7 @@ const CarouselContent = forwardRef(
         })
 
         dispatch({
-          type: 'SET_SLIDE_CHILDREN_ITEMS',
+          type: types.SET_SLIDE_CHILDREN_ITEMS,
           payload: processedItems
         })
       }
@@ -163,14 +165,14 @@ const CarouselContent = forwardRef(
         })
 
       dispatch({
-        type: 'SET_CURRENT_SLIDE_FORMATTED',
+        type: types.SET_CURRENT_SLIDE_FORMATTED,
         payload: formattedCurrentSlide
       })
     }, [state.currentSlide, state.slideCount, dispatch])
 
     useEffect(() => {
       dispatch({
-        type: 'SET_CONFIG',
+        type: types.SET_CONFIG,
         payload: {
           infinity,
           restartOnEnd,
