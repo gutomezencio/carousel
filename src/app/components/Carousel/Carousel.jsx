@@ -133,7 +133,7 @@ const CarouselContent = forwardRef(
       if (state.childrenItems) {
         initCarouselValues()
       }
-    }, [state.childrenItems])
+    }, [state.childrenItems, initCarouselValues])
 
     const initCarouselChildrens = () => {
       if (children && carouselRef?.current) {

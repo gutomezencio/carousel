@@ -1,22 +1,16 @@
-import React, {
-  useImperativeHandle,
-  useContext,
-  useCallback,
-  useEffect,
-  useRef,
-  forwardRef
-} from 'react'
+import React, { useImperativeHandle, useContext, useCallback, useEffect, forwardRef } from 'react'
 import PropTypes from 'prop-types'
 
 import { CarouselContext } from './CarouselContext'
-import { getAbsoluteWidth } from 'app/utils'
+
+import useNextHandler from './CarouselHooks/useNextHandler'
+import usePrevHandler from './CarouselHooks/usePrevHandler'
 
 import './Carousel.scoped.scss'
 
 const CarouselActions = forwardRef(
   ({ applyListTranslation, listRefCurrent, wrapperRefCurrent, toggleSwipingClass }, ref) => {
     const { dispatch, state } = useContext(CarouselContext)
-    const instanceRef = useRef()
     const swipingControl = {
       state: {
         active: false,
@@ -33,130 +27,8 @@ const CarouselActions = forwardRef(
       }
     }
 
-    const infinityNextHandler = useCallback(() => {
-      const itemWidth = getAbsoluteWidth(state.slideItemsEl[0])
-      const wrapperWidth = getAbsoluteWidth(wrapperRefCurrent)
-
-      const currentItemsEls = listRefCurrent.querySelectorAll('.carousel__item')
-      const listWidth =
-        itemWidth.fullWidth * currentItemsEls.length -
-        itemWidth.margin -
-        listRefCurrent.style.left.replace(/px|-/g, '')
-      const currentCount = parseInt(listWidth / wrapperWidth.fullWidth)
-      const translationMultiplier =
-        state.currentSlide < 0 ? Math.abs(state.currentSlide) - 1 : state.currentSlide + 1
-
-      if (currentCount === state.currentSlide + 1) {
-        Array.from(state.slideItemsEl).forEach(elNode => {
-          const currentEls = listRefCurrent.querySelectorAll('.carousel__item')
-
-          listRefCurrent.insertBefore(
-            elNode.cloneNode(true),
-            currentEls[currentEls.length - 1].nextSibling
-          )
-        })
-      }
-
-      applyListTranslation(`${state.currentSlide < 0 ? '' : '-'}${translationMultiplier * 100}`)
-      dispatch({
-        type: 'SET_CURRENT_SLIDE',
-        payload: state.currentSlide + 1
-      })
-    }, [
-      state.slideItemsEl,
-      state.currentSlide,
-      wrapperRefCurrent,
-      listRefCurrent,
-      applyListTranslation,
-      dispatch
-    ])
-
-    const infinityPrevHandler = useCallback(() => {
-      const itemWidth = getAbsoluteWidth(state.slideItemsEl[0])
-      const cloneQuant = state.slideItemsEl.length
-      const leftMultiplier = state.currentSlide ? Math.abs(state.currentSlide) + 1 : 1
-
-      listRefCurrent.style.left = `-${
-        (itemWidth.fullWidth + itemWidth.margin) * leftMultiplier * cloneQuant
-      }px`
-
-      Array.from(state.slideItemsEl)
-        .reverse()
-        .forEach(elNode => {
-          listRefCurrent.insertBefore(
-            elNode.cloneNode(true),
-            listRefCurrent.querySelectorAll('.carousel__item')[0]
-          )
-        })
-
-      applyListTranslation(leftMultiplier * 100)
-      dispatch({
-        type: 'SET_CURRENT_SLIDE',
-        payload: state.currentSlide - 1
-      })
-    }, [state.slideItemsEl, state.currentSlide, listRefCurrent, applyListTranslation, dispatch])
-
-    const nextHandler = useCallback(
-      swiping => {
-        if (state.config.infinity && !state.config.restartOnEnd) {
-          infinityNextHandler()
-        } else if (state.currentSlide < state.slideCount) {
-          applyListTranslation(`-${(state.currentSlide + 1) * 100}`)
-          dispatch({
-            type: 'SET_CURRENT_SLIDE',
-            payload: state.currentSlide + 1
-          })
-        } else if (state.config.restartOnEnd) {
-          applyListTranslation(0)
-          dispatch({
-            type: 'SET_CURRENT_SLIDE',
-            payload: 0
-          })
-        } else if (swiping) {
-          applyListTranslation(`-${state.currentSlide * 100}`)
-        }
-      },
-      [
-        state.config.infinity,
-        state.config.restartOnEnd,
-        state.currentSlide,
-        state.slideCount,
-        infinityNextHandler,
-        applyListTranslation,
-        dispatch
-      ]
-    )
-
-    const prevHandler = useCallback(
-      swiping => {
-        if (state.currentSlide > 0) {
-          applyListTranslation(`-${(state.currentSlide - 1) * 100}`)
-          dispatch({
-            type: 'SET_CURRENT_SLIDE',
-            payload: state.currentSlide - 1
-          })
-        } else if (state.config.restartOnEnd) {
-          applyListTranslation(`-${state.slideCount * 100}`)
-          dispatch({
-            type: 'SET_CURRENT_SLIDE',
-            payload: state.slideCount
-          })
-        } else if (state.config.infinity) {
-          infinityPrevHandler()
-        } else if (swiping) {
-          applyListTranslation('0')
-        }
-      },
-      [
-        state.config.infinity,
-        state.config.restartOnEnd,
-        state.currentSlide,
-        state.slideCount,
-        applyListTranslation,
-        infinityPrevHandler,
-        dispatch
-      ]
-    )
+    const nextHandler = useNextHandler(listRefCurrent, wrapperRefCurrent, applyListTranslation)
+    const prevHandler = usePrevHandler(listRefCurrent, applyListTranslation)
 
     const buttonInactive = useCallback(
       type => {
@@ -198,9 +70,9 @@ const CarouselActions = forwardRef(
 
       if (distanceX > 15 && distanceY < 100) {
         if (x < swipingControl.state.firstX) {
-          instanceRef.current.nextHandler(true)
+          ref.current.nextHandler(true)
         } else if (x > swipingControl.state.firstX) {
-          instanceRef.current.prevHandler(true)
+          ref.current.prevHandler(true)
         }
       }
     }
@@ -233,9 +105,9 @@ const CarouselActions = forwardRef(
       if (swipingControl.state.active) {
         if (event.screenX) {
           if (event.screenX - swipingControl.state.firstX > 0) {
-            instanceRef.current.prevHandler(true)
+            ref.current.prevHandler(true)
           } else {
-            instanceRef.current.nextHandler(true)
+            ref.current.nextHandler(true)
           }
         } else {
           touchEndHandler(event.changedTouches[0])
@@ -277,11 +149,6 @@ const CarouselActions = forwardRef(
 
     useEffect(swipeEventListener, [])
     useEffect(touchEventListener, [])
-
-    useImperativeHandle(instanceRef, () => ({
-      prevHandler,
-      nextHandler
-    }))
 
     useImperativeHandle(ref, () => ({
       prevHandler,
