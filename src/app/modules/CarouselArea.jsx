@@ -4,34 +4,7 @@ import './CarouselArea.scoped.scss'
 
 import Carousel from 'app/components/Carousel/Carousel'
 
-const carouselItems = [
-  'https://picsum.photos/id/111',
-  'https://picsum.photos/id/122',
-  'https://picsum.photos/id/133',
-  'https://picsum.photos/id/144',
-  'https://picsum.photos/id/155',
-  'https://picsum.photos/id/166',
-  'https://picsum.photos/id/177',
-  'https://picsum.photos/id/188',
-  'https://picsum.photos/id/199'
-]
-
-const GenerateItems = (quant, customSize, text) => {
-  return carouselItems?.slice(0, quant)?.map((image, index) => {
-    return (
-      <div className="some-class" key={index}>
-        <img src={`${image}/${customSize || '/300/300'}`} alt={`image-${index}`} />
-        {text && (
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam dictum dolor non porta
-            mollis. In tincidunt velit in tellus tristique scelerisque sed eget ligula. Nulla quam
-            risus, consequat sit amet ex non, pharetra aliquet neque.
-          </p>
-        )}
-      </div>
-    )
-  })
-}
+import { GenerateCarouselSlideItems } from 'app/components/GenerateCarouselSlideItems'
 
 const CarouselArea = () => {
   const [onChangeValues, setOnChangeValues] = useState('')
@@ -55,7 +28,7 @@ const CarouselArea = () => {
         {useMemo(
           () => (
             <Carousel visibleItems={1} height={'auto'} width={'auto'}>
-              {GenerateItems(9, '/500/500')}
+              {GenerateCarouselSlideItems(9, '/500/500')}
             </Carousel>
           ),
           []
@@ -67,7 +40,7 @@ const CarouselArea = () => {
         {useMemo(
           () => (
             <Carousel visibleItems={1} height={'auto'} width={'500px'}>
-              {GenerateItems(9)}
+              {GenerateCarouselSlideItems(9)}
             </Carousel>
           ),
           []
@@ -79,7 +52,7 @@ const CarouselArea = () => {
         {useMemo(
           () => (
             <Carousel visibleItems={1} height={'auto'} width={'80%'}>
-              {GenerateItems(9)}
+              {GenerateCarouselSlideItems(9)}
             </Carousel>
           ),
           []
@@ -91,7 +64,7 @@ const CarouselArea = () => {
         {useMemo(
           () => (
             <Carousel visibleItems={1} height={'400px'} width={'600px'}>
-              {GenerateItems(9, null, true)}
+              {GenerateCarouselSlideItems(9, null, true)}
             </Carousel>
           ),
           []
@@ -102,7 +75,7 @@ const CarouselArea = () => {
         <h2>Image and Text and one Visible Slide</h2>
         {useMemo(
           () => (
-            <Carousel visibleItems={1}>{GenerateItems(9, null, true)}</Carousel>
+            <Carousel visibleItems={1}>{GenerateCarouselSlideItems(9, null, true)}</Carousel>
           ),
           []
         )}
@@ -112,7 +85,7 @@ const CarouselArea = () => {
         <h2>Simple one Visible Slide</h2>
         {useMemo(
           () => (
-            <Carousel visibleItems={1}>{GenerateItems(9)}</Carousel>
+            <Carousel visibleItems={1}>{GenerateCarouselSlideItems(9)}</Carousel>
           ),
           []
         )}
@@ -122,7 +95,7 @@ const CarouselArea = () => {
         <h2>Without any Config</h2>
         {useMemo(
           () => (
-            <Carousel>{GenerateItems(9)}</Carousel>
+            <Carousel>{GenerateCarouselSlideItems(9)}</Carousel>
           ),
           []
         )}
@@ -132,7 +105,7 @@ const CarouselArea = () => {
         <h2>Simple Infinity</h2>
         {useMemo(
           () => (
-            <Carousel infinity={true}>{GenerateItems(8)}</Carousel>
+            <Carousel infinity={true}>{GenerateCarouselSlideItems(8)}</Carousel>
           ),
           []
         )}
@@ -143,7 +116,7 @@ const CarouselArea = () => {
         {useMemo(
           () => (
             <Carousel visibleItems={5} infinity={true}>
-              {GenerateItems(8)}
+              {GenerateCarouselSlideItems(8)}
             </Carousel>
           ),
           []
@@ -154,7 +127,7 @@ const CarouselArea = () => {
         <h2>Infinity with less slides than available spaces for Visible Slides</h2>
         {useMemo(
           () => (
-            <Carousel infinity={true}>{GenerateItems(4)}</Carousel>
+            <Carousel infinity={true}>{GenerateCarouselSlideItems(4)}</Carousel>
           ),
           []
         )}
@@ -165,7 +138,7 @@ const CarouselArea = () => {
         {useMemo(
           () => (
             <Carousel visibleItems={1} restartOnEnd={true}>
-              {GenerateItems(9)}
+              {GenerateCarouselSlideItems(9)}
             </Carousel>
           ),
           []
@@ -176,7 +149,7 @@ const CarouselArea = () => {
         <h2>Simple with Restarting on end</h2>
         {useMemo(
           () => (
-            <Carousel restartOnEnd={true}>{GenerateItems(9)}</Carousel>
+            <Carousel restartOnEnd={true}>{GenerateCarouselSlideItems(9)}</Carousel>
           ),
           []
         )}
@@ -187,7 +160,7 @@ const CarouselArea = () => {
         {useMemo(
           () => (
             <Carousel restartOnEnd={true} showNavigation={true} visibleItems={2}>
-              {GenerateItems(9)}
+              {GenerateCarouselSlideItems(9)}
             </Carousel>
           ),
           []
@@ -204,7 +177,7 @@ const CarouselArea = () => {
               visibleItems={3}
               showCurrentNumber={true}
             >
-              {GenerateItems(9)}
+              {GenerateCarouselSlideItems(9)}
             </Carousel>
           ),
           []
@@ -230,7 +203,7 @@ const CarouselArea = () => {
               visibleItems={2}
               restartOnEnd={true}
             >
-              {GenerateItems(9)}
+              {GenerateCarouselSlideItems(9)}
             </Carousel>
           ),
           [onChangeCallback]
@@ -243,7 +216,7 @@ const CarouselArea = () => {
         {useMemo(
           () => (
             <Carousel visibleItems={2} restartOnEnd={true} hideActions={true}>
-              {GenerateItems(5)}
+              {GenerateCarouselSlideItems(5)}
             </Carousel>
           ),
           []
@@ -260,7 +233,7 @@ const CarouselArea = () => {
               hideActions={true}
               ref={customPrevAndNextRef}
             >
-              {GenerateItems(5)}
+              {GenerateCarouselSlideItems(5)}
             </Carousel>
           ),
           []
