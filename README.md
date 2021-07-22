@@ -5,7 +5,7 @@
 First of all you need to install the dependencies for this project, for that you could use `npm` or `yarn`:
 
 ```sh
-$ npm i
+$ npm i --legacy-peer-deps
 // or
 $ yarn install
 ```
