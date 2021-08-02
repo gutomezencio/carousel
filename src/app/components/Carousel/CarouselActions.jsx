@@ -51,12 +51,13 @@ const CarouselActions = forwardRef(
       const style = window.getComputedStyle(listRefCurrent)
       const matrix = new DOMMatrixReadOnly(style.transform)
       const firstX = event.screenX || event.changedTouches[0].clientX
+      const firstY = event.screenY || event.changedTouches[0].clientY
       const currentTranslate = matrix.m41
 
       swipingControl.update({
         active: true,
         firstX,
-        firstY: event.changedTouches?.[0].clientY,
+        firstY,
         currentTranslate
       })
 
@@ -104,9 +105,11 @@ const CarouselActions = forwardRef(
     const swipeEndHandler = event => {
       if (swipingControl.state.active) {
         if (event.screenX) {
-          if (event.screenX - swipingControl.state.firstX > 0) {
+          const xDiff = event.screenX - swipingControl.state.firstX
+
+          if (xDiff > 0) {
             ref.current.prevHandler(true)
-          } else {
+          } else if (xDiff < 0) {
             ref.current.nextHandler(true)
           }
         } else {
