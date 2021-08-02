@@ -4,7 +4,7 @@
     margin: 20px 0;
     overflow: hidden;
 
-    /deep/ .carousel {
+    ::v-deep .carousel {
       margin: 0 auto;
     }
 

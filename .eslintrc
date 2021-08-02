@@ -19,7 +19,7 @@
     "fetch": true,
     "System": true
   },
-  "extends": ["plugin:prettier/recommended", "plugin:react/recommended"],
+  "extends": ["plugin:react/recommended", "plugin:react-hooks/recommended", "plugin:prettier/recommended"],
   "settings": {
     "react": {
       "version": "detect"
@@ -35,13 +35,8 @@
     "no-case-declarations": 0,
     "array-bracket-newline": ["error", { "multiline": true }],
     "no-multi-str": 1,
-    "max-len": ["error", { "ignoreTemplateLiterals": true }],
-    "prettier/prettier": [
-      "error",
-      {},
-      {
-        "usePrettierrc": true
-      }
-    ]
+    "max-len": ["error", { "ignoreTemplateLiterals": true, "ignoreComments": true, "code": 100 }],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   }
 }
