@@ -1,6 +1,6 @@
 const useCarouselTransition = listRefCurrent => {
-  return translationValue => {
-    listRefCurrent.style.transform = `translate3d(${translationValue}%, 0, 0)`
+  return (translationValue, unit = '%') => {
+    listRefCurrent.style.transform = `translate3d(${translationValue}${unit}, 0, 0)`
   }
 }
 

@@ -6,6 +6,9 @@ import { CarouselContext } from './context/context'
 import useNextHandler from './hooks/useNextHandler'
 import usePrevHandler from './hooks/usePrevHandler'
 
+import useCarouselTransition from './hooks/useCarouselTransition'
+import useGoToSlide from './hooks/useGoToSlide'
+
 import './Carousel.scoped.scss'
 
 const CarouselActions = forwardRef(
@@ -29,6 +32,7 @@ const CarouselActions = forwardRef(
 
     const nextHandler = useNextHandler(listRefCurrent, wrapperRefCurrent)
     const prevHandler = usePrevHandler(listRefCurrent)
+    const setCarouselTransition = useCarouselTransition(listRefCurrent)
 
     const buttonInactive = useCallback(
       type => {
@@ -46,10 +50,7 @@ const CarouselActions = forwardRef(
     )
 
     const swipeStartHandler = event => {
-      event.preventDefault()
-
-      const style = window.getComputedStyle(listRefCurrent)
-      const matrix = new DOMMatrixReadOnly(style.transform)
+      const matrix = new DOMMatrixReadOnly(window.getComputedStyle(listRefCurrent).transform)
       const firstX = event.screenX || event.changedTouches[0].clientX
       const firstY = event.screenY || event.changedTouches[0].clientY
       const currentTranslate = matrix.m41
@@ -61,7 +62,7 @@ const CarouselActions = forwardRef(
         currentTranslate
       })
 
-      listRefCurrent.style.transform = `translate3d(${currentTranslate}px, 0, 0)`
+      setCarouselTransition(currentTranslate, 'px')
     }
 
     const touchEndHandler = changedTouches => {
@@ -85,20 +86,22 @@ const CarouselActions = forwardRef(
         const eventX = event.screenX || event.changedTouches[0].clientX
         const currentX = eventX - swipingControl.state.firstX
 
-        // console.log('Y', Math.abs(event.changedTouches[0].clientY - swipingControl.state.firstY))
-        // console.log('X', Math.abs(event.changedTouches[0].clientX - swipingControl.state.firstX))
-
         if (
           !event.screenX &&
           Math.abs(event.changedTouches[0].clientY - swipingControl.state.firstY) > 150
         ) {
-          console.log('NO SW')
+          swipingControl.update({
+            active: false,
+            firstX: null,
+            firstY: null,
+            currentTranslate: null
+          })
+
+          toggleSwipingClass(false)
           return false
         }
 
-        listRefCurrent.style.transform = `translate3d(${
-          swipingControl.state.currentTranslate + currentX
-        }px, 0, 0)`
+        setCarouselTransition(swipingControl.state.currentTranslate + currentX, 'px')
       }
     }
 

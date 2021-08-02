@@ -17,6 +17,10 @@
 
     &--swiping {
       transition: none;
+
+      & ::v-deep .carousel__item {
+        pointer-events: none;
+      }
     }
   }
 
