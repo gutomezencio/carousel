@@ -7,7 +7,6 @@ import useNextHandler from './hooks/useNextHandler'
 import usePrevHandler from './hooks/usePrevHandler'
 
 import useCarouselTransition from './hooks/useCarouselTransition'
-import useGoToSlide from './hooks/useGoToSlide'
 
 import './Carousel.scoped.scss'
 
