@@ -14,12 +14,24 @@
         "jsx": true
     }
   },
-  "plugins": ["react", "prettier"],
+  "plugins": ["react", "prettier", "jest-dom"],
   "globals": {
     "fetch": true,
     "System": true
   },
-  "extends": ["plugin:react/recommended", "plugin:react-hooks/recommended", "plugin:prettier/recommended"],
+  "extends": [
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:prettier/recommended",
+    "plugin:testing-library/react",
+    "plugin:jest-dom/recommended"
+  ],
+  "overrides": [
+    {
+      "files": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+      "extends": ["plugin:testing-library/react"]
+    },
+  ],
   "settings": {
     "react": {
       "version": "detect"

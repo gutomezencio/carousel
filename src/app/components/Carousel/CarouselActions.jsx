@@ -21,7 +21,7 @@ const CarouselActions = forwardRef(
         currentTranslate: null,
         swipeClass: false
       },
-      update: function (newState) {
+      update(newState) {
         this.state = {
           ...this.state,
           ...newState
@@ -169,6 +169,7 @@ const CarouselActions = forwardRef(
             className={`carousel__actions__button ${
               buttonInactive('prev') ? 'carousel__actions__button--inactive' : ''
             }`}
+            disabled={buttonInactive('prev')}
           >
             Prev
           </button>
@@ -179,6 +180,7 @@ const CarouselActions = forwardRef(
             className={`carousel__actions__button ${
               buttonInactive('next') ? 'carousel__actions__button--inactive' : ''
             }`}
+            disabled={buttonInactive('next')}
           >
             Next
           </button>
@@ -191,9 +193,9 @@ const CarouselActions = forwardRef(
 CarouselActions.displayName = 'CarouselActions'
 
 CarouselActions.propTypes = {
-  listRefCurrent: PropTypes.object,
-  wrapperRefCurrent: PropTypes.object,
-  toggleSwipingClass: PropTypes.func
+  listRefCurrent: PropTypes.object.isRequired,
+  wrapperRefCurrent: PropTypes.object.isRequired,
+  toggleSwipingClass: PropTypes.func.isRequired
 }
 
 export default CarouselActions
