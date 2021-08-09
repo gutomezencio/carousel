@@ -1,23 +1,16 @@
-import React, { useReducer } from 'react'
+import React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import CarouselContextProvider from './context/provider'
 import CarouselActions from './CarouselActions'
 
-import reducers from './context/reducers'
-import carouselState from './context/state'
-import { CarouselContext } from './context/context'
+import ProviderTestWrapper from 'tests/ProviderTestWrapper'
 
 let listRefCurrent
 let wrapperRefCurrent
 let toggleSwipingClass = jest.fn()
 
-const ProviderTestWrapper = ({ children, currentState }) => {
-  const [state, dispatch] = useReducer(reducers, { ...carouselState, ...currentState })
-
-  return <CarouselContext.Provider value={{ state, dispatch }}>{children}</CarouselContext.Provider>
-}
 describe('<CarouselActions />', () => {
   beforeEach(() => {
     listRefCurrent = document.createElement('div')

@@ -3,10 +3,13 @@ import PropTypes from 'prop-types'
 
 import { CarouselContext } from './context/context'
 
+import useGoToSlide from './hooks/useGoToSlide'
+
 import './Carousel.scoped.scss'
 
-const CarouselNavigation = ({ goToSlide }) => {
+const CarouselNavigation = ({ listRefCurrent }) => {
   const { state } = useContext(CarouselContext)
+  const goToSlide = useGoToSlide(listRefCurrent)
 
   return (
     <div className="carousel__navigation">
@@ -29,7 +32,7 @@ const CarouselNavigation = ({ goToSlide }) => {
 }
 
 CarouselNavigation.propTypes = {
-  goToSlide: PropTypes.func
+  listRefCurrent: PropTypes.object.isRequired
 }
 
 export default CarouselNavigation
