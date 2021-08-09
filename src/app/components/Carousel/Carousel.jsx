@@ -218,7 +218,7 @@ const CarouselContent = forwardRef(
         )}
 
         {showNavigation && state.slideCount && !infinity && (
-          <CarouselNavigation goToSlide={goToSlide} />
+          <CarouselNavigation listRefCurrent={listRef.current} />
         )}
 
         {wrapperRef.current && listRef.current && (
