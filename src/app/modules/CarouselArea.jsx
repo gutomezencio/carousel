@@ -1,8 +1,8 @@
 import React, { useState, useRef, useCallback, useMemo } from 'react'
 
-import './CarouselArea.scoped.scss'
+// import './CarouselArea.scoped.scss'
 
-import Carousel from 'app/components/Carousel/Carousel'
+import Carousel from 'lib/Carousel/Carousel'
 
 import { GenerateCarouselSlideItems } from 'app/components/GenerateCarouselSlideItems'
 
@@ -171,7 +171,12 @@ const CarouselArea = () => {
         <h2>Go to Slide</h2>
         {useMemo(
           () => (
-            <Carousel restartOnEnd={true} ref={goToSlideExample} visibleItems={3} showCurrentNumber={true}>
+            <Carousel
+              restartOnEnd={true}
+              ref={goToSlideExample}
+              visibleItems={3}
+              showCurrentNumber={true}
+            >
               {GenerateCarouselSlideItems(9)}
             </Carousel>
           ),
@@ -180,7 +185,10 @@ const CarouselArea = () => {
         <p>
           Go to slide:
           <input type="text" onChange={({ target }) => setGoToSlideValue(target.value)} />
-          <button type="button" onClick={() => goToSlideExample?.current?.goToSlide(goToSlideValue)}>
+          <button
+            type="button"
+            onClick={() => goToSlideExample?.current?.goToSlide(goToSlideValue)}
+          >
             Go
           </button>
         </p>
@@ -190,7 +198,11 @@ const CarouselArea = () => {
         <h2>Simple with On Change</h2>
         {useMemo(
           () => (
-            <Carousel onChange={value => onChangeCallback(value)} visibleItems={2} restartOnEnd={true}>
+            <Carousel
+              onChange={value => onChangeCallback(value)}
+              visibleItems={2}
+              restartOnEnd={true}
+            >
               {GenerateCarouselSlideItems(9)}
             </Carousel>
           ),
@@ -215,7 +227,12 @@ const CarouselArea = () => {
         <h2>Custom Next and Prev</h2>
         {useMemo(
           () => (
-            <Carousel visibleItems={2} restartOnEnd={true} hideActions={true} ref={customPrevAndNextRef}>
+            <Carousel
+              visibleItems={2}
+              restartOnEnd={true}
+              hideActions={true}
+              ref={customPrevAndNextRef}
+            >
               {GenerateCarouselSlideItems(5)}
             </Carousel>
           ),

@@ -5,7 +5,7 @@ import { CarouselContext } from './context/context'
 
 import useGoToSlide from './hooks/useGoToSlide'
 
-import './Carousel.scoped.scss'
+import './CarouselNavigation.scss'
 
 const CarouselNavigation = ({ listRefCurrent }) => {
   const { state } = useContext(CarouselContext)

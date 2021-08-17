@@ -1,0 +1,19 @@
+.carousel {
+  &__navigation {
+    margin: 10px 0;
+
+    &__number {
+      background: none;
+      padding: 2px;
+      border: 1px solid #ddd;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      margin-right: 5px;
+
+      &--current {
+        color: #D6383E;
+      }
+    }
+  }
+}

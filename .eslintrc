@@ -47,7 +47,7 @@
     "no-case-declarations": 0,
     "array-bracket-newline": ["error", { "multiline": true }],
     "no-multi-str": 1,
-    "max-len": ["error", { "ignoreTemplateLiterals": true, "ignoreComments": true, "code": 120 }],
+    "max-len": ["error", { "ignoreTemplateLiterals": true, "ignoreComments": true, "code": 100 }],
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn"
   }

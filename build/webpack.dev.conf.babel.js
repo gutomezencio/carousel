@@ -25,7 +25,6 @@ export default {
               importLoaders: 2
             }
           },
-          'scoped-css-loader',
           'sass-loader'
         ]
       }
@@ -36,6 +35,7 @@ export default {
     alias: {
       app: pathResolve('src/app'),
       assets: pathResolve('src/app/assets'),
+      lib: pathResolve('src/lib'),
       'react-dom': '@hot-loader/react-dom'
     }
   },
