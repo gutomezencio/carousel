@@ -18,7 +18,7 @@ import CarouselNavigation from './CarouselNavigation'
 
 import { getAbsoluteWidth, waitForElementWidth } from 'app/utils'
 
-import './Carousel.scoped.scss'
+import './Carousel.scss'
 
 import useGoToSlide from './hooks/useGoToSlide'
 
@@ -118,7 +118,7 @@ const CarouselContent = forwardRef(
       }
     }, [state.childrenItems, initCarouselValues])
 
-    const initCarouselChildrens = () => {
+    useEffect(() => {
       if (children && carouselRef?.current) {
         if (width) {
           carouselRef.current.style.width = width
@@ -146,9 +146,7 @@ const CarouselContent = forwardRef(
           payload: processedItems
         })
       }
-    }
-
-    useEffect(initCarouselChildrens, [dispatch, children, width, visibleItems, height])
+    }, [dispatch, children, width, visibleItems, height])
 
     useEffect(() => {
       onChangeCallback.current = onChange

@@ -8,7 +8,7 @@ import usePrevHandler from './hooks/usePrevHandler'
 
 import useCarouselTransition from './hooks/useCarouselTransition'
 
-import './Carousel.scoped.scss'
+import './CarouselActions.scss'
 
 const CarouselActions = forwardRef(
   ({ listRefCurrent, wrapperRefCurrent, toggleSwipingClass }, ref) => {

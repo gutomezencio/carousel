@@ -1,0 +1,29 @@
+.carousel {
+  &__actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &__button {
+      background: none;
+      border: none;
+      font-size: 18px;
+
+      &:hover,
+      &:active {
+        color: #D6383E;
+      }
+
+      &--inactive {
+        opacity: .5;
+        pointer-events: none;
+        color: #ccc;
+
+        &:hover,
+        &:active {
+          color: #ccc;
+        }
+      }
+    }
+  }
+}

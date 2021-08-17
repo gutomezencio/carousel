@@ -6,7 +6,6 @@ import { BrowserRouter as Router, Route } from 'react-router-dom'
 import CarouselArea from 'app/modules/CarouselArea'
 
 import 'app/styles/default.scss'
-
 const App = () => {
   return (
     <Router>
