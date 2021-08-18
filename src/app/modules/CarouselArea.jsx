@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useMemo } from 'react'
 
-// import './CarouselArea.scoped.scss'
+import './CarouselArea.scoped.scss'
 
 import Carousel from 'lib/Carousel/Carousel'
 
