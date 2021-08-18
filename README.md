@@ -24,16 +24,15 @@ The application will be available over <http://localhost:4000>
 
 The stack chosen for this project was:
 
-- Webpack 5
 - React
-- Scoped CSS
+- SASS
+- Webpack 5
 - Babel
 - Eslint
 - Prettier
+- Jest + React Testing Library
 
 ### To-do
 
-- Add unit tests
 - Add E2E tests
-- Config a bundle for production
 - Publish this component / package to NPM
