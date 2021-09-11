@@ -1,6 +1,6 @@
 {
   "name": "react-custom-light-slider",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "React Custom Light Slider",
   "scripts": {
     "test": "jest src",
