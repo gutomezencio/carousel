@@ -1,4 +1,4 @@
-# Simple React Carousel Component
+# React Custom Light Slider
 
 ### How to run:
 
@@ -22,8 +22,6 @@ The application will be available over <http://localhost:4000>
 
 ### Stack:
 
-The stack chosen for this project was:
-
 - React
 - SASS
 - Webpack 5
@@ -35,4 +33,4 @@ The stack chosen for this project was:
 ### To-do
 
 - Add E2E tests
-- Publish this component / package to NPM
+- Add CI/CD for auto publish

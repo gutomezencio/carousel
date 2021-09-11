@@ -1,7 +1,7 @@
 {
-  "name": "carousel",
+  "name": "react-custom-light-slider",
   "version": "0.0.1",
-  "description": "Simple React Carousel Component",
+  "description": "React Custom Light Slider",
   "scripts": {
     "test": "jest src",
     "dev": "NODE_ENV=development webpack serve --config build/webpack.dev.conf.babel.js",
