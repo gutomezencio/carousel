@@ -33,4 +33,3 @@ The application will be available over <http://localhost:4000>
 ### To-do
 
 - Add E2E tests
-- Add CI/CD for auto publish
