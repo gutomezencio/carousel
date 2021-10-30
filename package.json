@@ -7,7 +7,9 @@
     "dev": "NODE_ENV=development webpack serve --config build/webpack.dev.conf.babel.js",
     "build": "NODE_ENV=production webpack --config build/webpack.prod.conf.babel.js",
     "lint": "eslint --ext .js,.jsx --fix src build",
-    "format": "prettier --check \"src/**/*.(js|jsx)\""
+    "format": "prettier --check \"src/**/*.(js|jsx)\"",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -30,6 +32,12 @@
     "@babel/preset-env": "^7.14.1",
     "@babel/preset-react": "^7.13.13",
     "@hot-loader/react-dom": "^17.0.1",
+    "@storybook/addon-actions": "^6.3.12",
+    "@storybook/addon-essentials": "^6.3.12",
+    "@storybook/addon-links": "^6.3.12",
+    "@storybook/builder-webpack5": "^6.3.12",
+    "@storybook/manager-webpack5": "^6.3.12",
+    "@storybook/react": "^6.3.12",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.0.0",
     "@testing-library/user-event": "^13.2.1",
