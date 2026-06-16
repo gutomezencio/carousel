@@ -4,8 +4,8 @@
   "description": "Simple React Carousel Component",
   "scripts": {
     "test": "jest src",
-    "dev": "NODE_ENV=development webpack serve --config build/webpack.dev.conf.babel.js",
-    "build": "NODE_ENV=production webpack --config build/webpack.prod.conf.babel.js",
+    "dev": "NODE_ENV=development NODE_OPTIONS=--openssl-legacy-provider webpack serve --config build/webpack.dev.conf.babel.js",
+    "build": "NODE_ENV=production NODE_OPTIONS=--openssl-legacy-provider webpack --config build/webpack.prod.conf.babel.js",
     "lint": "eslint --ext .js,.jsx --fix src build",
     "format": "prettier --check \"src/**/*.(js|jsx)\""
   },
