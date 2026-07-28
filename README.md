@@ -54,7 +54,7 @@ The application will be available over <http://localhost:4000>
 
 - React
 - SASS
-- Webpack 5
+- Webpack 7
 - Babel
 - Eslint
 - Prettier
