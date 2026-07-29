@@ -2,6 +2,9 @@
   "name": "react-custom-light-slider",
   "version": "0.0.6",
   "description": "React Custom Light Slider",
+  "repository": {
+    "url": "https://github.com/gutomezencio/carousel"
+  },
   "scripts": {
     "test": "jest src",
     "dev": "NODE_ENV=development NODE_OPTIONS=--openssl-legacy-provider webpack serve --config build/webpack.dev.conf.babel.js",
